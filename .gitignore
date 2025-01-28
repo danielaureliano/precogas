@@ -1,0 +1,11 @@
+# Ignore o ambiente virtual
+venv/
+__pycache__/
+*.pyc
+
+# Dados baixados
+dados_anp/
+*.xlsx
+
+# Configurações sensíveis
+.env
