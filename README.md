@@ -22,3 +22,11 @@ Retorna as informações mais recentes do preço médio de gasolina comum no Dis
   "DATA FINAL": "2025-01-25",
   "PREÇO MÉDIO REVENDA": 5.659
 }
+
+## Próximos Passos
+
+Agora que tudo está funcionando, algumas melhorias podem ser feitas:
+
+- 🚀 **Adicionar suporte a outros estados** (permitir que o usuário informe qual estado consultar).
+- ⚡ **Implementar um sistema de cache** para evitar downloads repetitivos.
+- 🛠️ **Criar testes automatizados** para garantir que o código continue funcionando mesmo se a ANP mudar o formato do arquivo.
