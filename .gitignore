@@ -9,3 +9,8 @@ dados_anp/
 
 # Configurações sensíveis
 .env
+
+#config vscode
+.vscode/
+*.vscode
+vscode/
