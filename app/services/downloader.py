@@ -3,8 +3,11 @@ import redis  # Adicionando a importação do Redis
 import requests
 from datetime import datetime, timedelta
 
+#Pegamos a URL do Redis da variável de ambiente
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
+
 # Conexão com Redis (container rodando no Docker)
-redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+redis_client = redis.Redis.from_url(REDIS_URL, decode_responses=True)
 
 BASE_URL = "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/arquivos-lpc"
 OUTPUT_DIR = "./dados_anp/"
