@@ -10,9 +10,7 @@ def extrair_dados(caminho_arquivo):
 
         # Ajuste: Ignorar as 9 primeiras linhas e definir a linha 10 como cabeçalho
         df_estados = excel_data.parse("ESTADOS", skiprows=9)  # <-- Pula as 9 primeiras linhas
-        
-        # Debug: Mostrar todas as colunas disponíveis
-        print("Colunas encontradas na aba 'ESTADOS':", df_estados.columns.tolist())
+
 
         # Ajuste para garantir que os nomes das colunas estejam corretos
         df_estados.rename(columns=lambda x: str(x).strip(), inplace=True)
@@ -27,7 +25,15 @@ def extrair_dados(caminho_arquivo):
             print("Nenhum dado encontrado para GASOLINA COMUM no DISTRITO FEDERAL.")
             return None
 
-        return df_filtrado[["DATA INICIAL", "DATA FINAL", "PREÇO MÉDIO REVENDA"]].iloc[0].to_dict()
+        # 🔹 Mapeando os nomes das chaves para o novo formato
+        dados = df_filtrado.iloc[0][["DATA INICIAL", "DATA FINAL", "PREÇO MÉDIO REVENDA"]].to_dict()
+        dados_formatados = {
+            "dataInicial": dados["DATA INICIAL"],
+            "dataFinal": dados["DATA FINAL"],
+            "precoMedioRevenda": dados["PREÇO MÉDIO REVENDA"]
+        }
+
+        return dados_formatados
 
     except Exception as e:
         print(f"Erro ao processar o arquivo: {e}")
