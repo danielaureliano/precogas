@@ -1,0 +1,24 @@
+services:
+  # Serviço Web (API FastAPI)
+  - type: web
+    name: precogas-api
+    env: python
+    region: oregon # Região padrão, pode ser alterada
+    plan: free # Plano gratuito (se disponível/desejado)
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: redis-cache
+          property: connectionString
+
+  # Banco de Dados (Redis Gerenciado)
+  - type: redis
+    name: redis-cache
+    region: oregon
+    plan: free # Plano gratuito (Instance type: starter no Render, se free não estiver explícito na yaml)
+    ipAllowList: [] # Apenas serviços internos podem acessar
