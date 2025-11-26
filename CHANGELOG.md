@@ -7,25 +7,37 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [v1.0.0] - 2025-11-26
 
-### ✨ Features (Novas Funcionalidades)
-- **deploy:** Adiciona configuração (`render.yaml`) para deploy automatizado no Render.com (1aff834)
-- **cache:** Implementação de cache com Redis e Docker para otimizar performance (40d8aa8)
-- **api:** Definição de endpoints e formato de resposta JSON (860f6b6)
-
-### 🐛 Bug Fixes (Correções de Bugs)
-- **deploy:** Corrigida string de conexão com Redis no ambiente Render (83a6cef)
-- **etl:** Correção da extração de dados da planilha ANP (c2f50a0)
-
-### ♻️ Refactor (Refatoração)
-- **downloader:** Refatoração da lógica de download com fallback para semanas anteriores (7558213)
-
 ### 📝 Documentation (Documentação)
-- **geral:** Padronização completa (README, LICENSE, SECURITY) e guias de contribuição (b5fec8a)
-- **docs:** Criação de CHANGELOG, TODO e SECURITY.md
+- **geral:** Padronização completa da documentação (README, LICENSE, SECURITY) e guias de contribuição.
+- **docs:** Criação oficial do CHANGELOG.md e TODO.md revisado.
+- **license:** Adição da licença MIT.
 
 ### 🔧 Chore (Manutenção)
-- **ci:** Configuração de Workflows do GitHub Actions e templates de issue.
-- **init:** Estrutura inicial e configurações do projeto.
+- **ci:** Configuração completa de Workflows do GitHub Actions (Issues, PRs, CI).
 
----
-*Release inicial do projeto PrecoGas.*
+## [v0.4.0] - 2025-11-25
+
+### ✨ Features
+- **deploy:** Adiciona configuração (`render.yaml`) para deploy automatizado no Render.com, incluindo orquestração do serviço web e Redis.
+
+## [v0.3.0] - 2025-01-30
+
+### ✨ Features
+- **cache:** Implementação de sistema de cache utilizando Redis e Docker para evitar downloads repetidos e melhorar a performance da API.
+
+### 🐛 Bug Fixes
+- **deploy:** Ajuste na string de conexão com Redis (`REDIS_URL`) para compatibilidade com ambiente de produção.
+
+## [v0.2.0] - 2025-01-29
+
+### 🐛 Bug Fixes
+- **etl:** Correção crítica na extração de dados da planilha da ANP. Ajuste do parâmetro `skiprows` para considerar o cabeçalho na linha 10 e correção do nome da coluna "ESTADOS".
+
+### ♻️ Refactor
+- **downloader:** Refatoração da função de geração de URL para implementar fallback resiliente, buscando arquivos de até 3 semanas anteriores caso o atual não esteja disponível.
+
+## [v0.1.0] - 2025-01-28
+
+### 🎉 Initial
+- **project:** Estrutura inicial do projeto PrecoGas (FastAPI, Uvicorn).
+- **api:** Definição básica dos endpoints e serviços de download.
