@@ -1,21 +1,12 @@
-# Security Policy
+# Política de Segurança
 
-## Supported Versions
+## Relatando uma Vulnerabilidade
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+Agradecemos por sua contribuição para a segurança do projeto PrecoGas. Se você encontrou uma vulnerabilidade, por favor, relate-a abrindo uma issue no nosso repositório GitHub.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+Ao relatar, por favor, inclua:
+*   Uma descrição detalhada da vulnerabilidade.
+*   Passos para reproduzir a vulnerabilidade.
+*   Potencial impacto da vulnerabilidade.
 
-## Reporting a Vulnerability
-
-Use this section to tell people how to report a vulnerability.
-
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Manteremos você informado sobre o progresso e a resolução da vulnerabilidade.
