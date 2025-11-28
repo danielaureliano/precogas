@@ -65,6 +65,7 @@ Todo código gerado, refatorado ou revisado deve seguir estritamente estas regra
 *   **Princípios:** Seguir **SOLID**, **KISS** (Simplicidade) e **DRY** (Não repetir código).
 *   **Código Idiomático:** Escrever código Pythonico (PEP 8), priorizando legibilidade.
 *   **Tipagem:** Utilizar **Tipagem Estática** (`type hints`) em todas as assinaturas de função e classe.
+*   **Logs Estruturados e Métricas:** Implementar logs em formato JSON (`structlog`) e métricas Prometheus para observabilidade. Incluir `timestamp`, `level`, `module`, `trace_id` e métricas como `requests_total`, `response_time_seconds`.
 *   **Manipulação de Arquivos:** Usar a biblioteca `pathlib` para todas as manipulações de caminho.
 *   **Performance (ETL):** Priorizar vetorização (NumPy/Pandas) para processamento de dados, evitando loops Python.
 *   **Configuração Externa:** Utilizar arquivos YAML ou outros formatos para regras de negócio complexas.
@@ -105,10 +106,3 @@ Todo código gerado, refatorado ou revisado deve seguir estritamente estas regra
 
 ### 5. Estilo de Interação do Agente
 *   **Abordagem "Code-First":** O agente deve priorizar a entrega de código funcional antes de explicações teóricas.
-
-## 📝 Roadmap (TODO)
-Conforme `TODO.md`:
-*   [ ] 🚀 Adicionar suporte a outros estados (parâmetro na URL).
-*   [ ] 🔒 Monitorar vulnerabilidades de dependências (Dependabot).
-*   [x] ⚡ Implementar sistema de cache (Redis).
-*   [x] 🛠️ Criar testes automatizados.
