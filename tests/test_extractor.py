@@ -6,6 +6,10 @@ from app.services.extractor import extrair_dados
 # Mock do objeto ExcelFile e do DataFrame
 @patch("pandas.ExcelFile")
 def test_extrair_dados_sucesso(mock_excel_file):
+    """
+    Testa a extração bem-sucedida de dados quando o arquivo Excel é válido
+    e contém os dados esperados (DF, Gasolina Comum).
+    """
     # Mock da leitura do Excel
     mock_instance = mock_excel_file.return_value
     mock_instance.sheet_names = ["ESTADOS"]
@@ -29,6 +33,9 @@ def test_extrair_dados_sucesso(mock_excel_file):
 
 @patch("pandas.ExcelFile")
 def test_extrair_dados_aba_inexistente(mock_excel_file):
+    """
+    Testa a falha quando a aba 'ESTADOS' não existe na planilha.
+    """
     mock_instance = mock_excel_file.return_value
     mock_instance.sheet_names = ["OUTRA_ABA"] # Não tem ESTADOS
 
@@ -37,6 +44,10 @@ def test_extrair_dados_aba_inexistente(mock_excel_file):
 
 @patch("pandas.ExcelFile")
 def test_extrair_dados_produto_nao_encontrado(mock_excel_file):
+    """
+    Testa o caso onde a aba existe, mas não há dados para o filtro
+    específico (DF + Gasolina Comum).
+    """
     mock_instance = mock_excel_file.return_value
     mock_instance.sheet_names = ["ESTADOS"]
     
@@ -54,6 +65,10 @@ def test_extrair_dados_produto_nao_encontrado(mock_excel_file):
     assert resultado is None
 
 def test_extrair_dados_arquivo_invalido():
+    """
+    Testa a resiliência quando o arquivo não existe ou está corrompido
+    (Pandas levanta exceção).
+    """
     # Sem mock, passando um caminho que não existe, o pandas deve lançar erro
     # A função captura Exception e retorna None
     resultado = extrair_dados("caminho/nao_existe.xlsx")

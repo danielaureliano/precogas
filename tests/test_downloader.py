@@ -3,8 +3,11 @@ from datetime import datetime
 from unittest.mock import patch, MagicMock
 from app.services.downloader import gerar_dados_semana, baixar_arquivo
 
-# Teste para garantir que a lógica de datas está correta
 def test_gerar_dados_semana():
+    """
+    Testa a lógica de cálculo de datas semanais (Segunda a Domingo).
+    Mocka a data atual para garantir determinismo nos testes.
+    """
     # Mock datetime.now() para uma data fixa: Quinta-feira, 27/11/2025
     with patch("app.services.downloader.datetime") as mock_datetime:
         mock_datetime.now.return_value = datetime(2025, 11, 27)
@@ -30,6 +33,11 @@ def test_gerar_dados_semana():
 @patch("app.services.downloader.os.path.exists")
 @patch("app.services.downloader.redis_client")
 def test_baixar_arquivo_sucesso(mock_redis, mock_exists, mock_open, mock_makedirs, mock_session):
+    """
+    Testa o fluxo completo de download com sucesso (HTTP 200).
+    Verifica se o arquivo é salvo e se os diretórios são criados.
+    Ignora cache e disco real.
+    """
     # Garante que não acha nada no cache nem no disco, forçando o download
     mock_exists.return_value = False
     if mock_redis:
@@ -60,6 +68,10 @@ def test_baixar_arquivo_sucesso(mock_redis, mock_exists, mock_open, mock_makedir
 @patch("app.services.downloader.os.path.exists")
 @patch("app.services.downloader.redis_client") # Mock do objeto redis global
 def test_baixar_arquivo_falha_404(mock_redis, mock_exists, mock_session):
+    """
+    Testa o comportamento quando todas as tentativas de download retornam 404.
+    Deve retornar None para todos os valores.
+    """
     # Garante que não acha nada no cache nem no disco
     mock_exists.return_value = False
     if mock_redis:

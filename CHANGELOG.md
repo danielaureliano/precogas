@@ -5,6 +5,29 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.2.0] - 2025-11-28
+
+### ✨ Features
+- **Tipo:** `feat`
+- **Escopo:** `(tests)`
+- **Descrição:** Implementação de suíte completa de testes automatizados com `pytest` e `pytest-cov`. Cobertura de código elevada para 87%.
+- **Impacto:** Garante a estabilidade e corretude das funcionalidades críticas (download, extração, API).
+
+- **Tipo:** `feat`
+- **Escopo:** `(ci)`
+- **Descrição:** Configuração de Pipeline de CI no GitHub Actions. Executa testes e verifica cobertura em cada Push e PR.
+- **Impacto:** Previne regressões e garante qualidade contínua.
+
+### 🔒 Security
+- **Tipo:** `fix`
+- **Escopo:** `(deps)`
+- **Descrição:** Atualização de dependências críticas (`starlette`, `urllib3`, `certifi`, etc.) para mitigar vulnerabilidades conhecidas.
+
+### 📝 Documentation
+- **Tipo:** `docs`
+- **Escopo:** `(code)`
+- **Descrição:** Adição de docstrings detalhadas aos arquivos de teste, explicando a finalidade de cada validação.
+
 ## [v1.1.0] - 2025-11-27
 
 ### 🐛 Bug Fixes

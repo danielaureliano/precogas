@@ -7,6 +7,11 @@ client = TestClient(app)
 @patch("app.main.baixar_arquivo")
 @patch("app.main.extrair_dados")
 def test_obter_precos_sucesso(mock_extrair, mock_baixar):
+    """
+    Testa o endpoint /precos com sucesso.
+    Verifica se a API retorna o JSON formatado corretamente quando
+    os serviços de download e extração funcionam.
+    """
     # Configura mocks
     mock_baixar.return_value = (
         "http://fake.url/file.xlsx",
@@ -30,6 +35,10 @@ def test_obter_precos_sucesso(mock_extrair, mock_baixar):
 
 @patch("app.main.baixar_arquivo")
 def test_obter_precos_falha_download(mock_baixar):
+    """
+    Testa o comportamento da API quando o download falha.
+    Deve retornar um JSON com chave 'erro'.
+    """
     # Simula falha no download (retorna None no caminho)
     mock_baixar.return_value = (None, None, None, None)
 
