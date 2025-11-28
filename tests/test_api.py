@@ -1,0 +1,40 @@
+from fastapi.testclient import TestClient
+from unittest.mock import patch
+from app.main import app
+
+client = TestClient(app)
+
+@patch("app.main.baixar_arquivo")
+@patch("app.main.extrair_dados")
+def test_obter_precos_sucesso(mock_extrair, mock_baixar):
+    # Configura mocks
+    mock_baixar.return_value = (
+        "http://fake.url/file.xlsx",
+        "2025-01-01",
+        "2025-01-07",
+        "./dados_anp/file.xlsx"
+    )
+    
+    mock_extrair.return_value = {
+        "dataInicial": "01/01/2025",
+        "dataFinal": "07/01/2025",
+        "precoMedioRevenda": 5.99
+    }
+
+    response = client.get("/precos")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["precoMedioRevenda"] == 5.99
+    assert data["dataInicial"] == "01/01/2025"
+
+@patch("app.main.baixar_arquivo")
+def test_obter_precos_falha_download(mock_baixar):
+    # Simula falha no download (retorna None no caminho)
+    mock_baixar.return_value = (None, None, None, None)
+
+    response = client.get("/precos")
+
+    assert response.status_code == 200 # A API retorna 200 com JSON de erro por design atual
+    assert "erro" in response.json()
+    assert response.json()["erro"] == "Arquivo não encontrado no site da ANP"
