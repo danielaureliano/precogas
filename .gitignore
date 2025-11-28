@@ -15,6 +15,11 @@ dados_anp/
 *.vscode
 vscode/
 
-
 .gemini/
 gha-creds-*.json
+
+# Testes e Cobertura
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/

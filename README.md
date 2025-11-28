@@ -97,6 +97,23 @@ Isso irá executar:
 - Testes de download (mockando requisições HTTP e sistema de arquivos).
 - Testes do endpoint `/precos` (simulando chamadas à API).
 
+## Configuração de Desenvolvimento
+
+Para garantir a qualidade do código localmente antes de enviar para o repositório, utilizamos **pre-commit hooks**.
+
+### Instalação
+
+1.  Instale as dependências de desenvolvimento:
+    ```bash
+    pip install -r requirements.txt
+    ```
+2.  Instale os hooks do git:
+    ```bash
+    pre-commit install
+    ```
+
+Agora, toda vez que você executar `git commit`, as verificações (Ruff, Pytest, etc.) rodarão automaticamente.
+
 ## CI/CD
 
 Este projeto utiliza **GitHub Actions** para automação de CI. O workflow (`.github/workflows/ci.yml`) é acionado em todo *push* e *pull request* para a branch `main` e executa:
