@@ -5,6 +5,21 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.2.1] - 2025-11-28
+
+### 🐛 Bug Fixes
+- **Tipo:** `fix`
+- **Escopo:** `(ci)`
+- **Descrição:** Definição de permissões explícitas (`contents: read`) no workflow de CI para mitigar alerta de segurança do CodeQL (`actions/missing-workflow-permissions`).
+
+### 📝 Documentation
+- **Tipo:** `docs`
+- **Escopo:** `(standards)`
+- **Descrição:** Documentação detalhada das convenções de Conventional Commits, versionamento e regras de segurança (`git push` explícito) no `README.md` e `GEMINI.md`.
+- **Tipo:** `docs`
+- **Escopo:** `(quality)`
+- **Descrição:** Inclusão de diretrizes de qualidade (SOLID, KISS, DRY, TDD) no contexto do projeto (`GEMINI.md`).
+
 ## [v1.2.0] - 2025-11-28
 
 ### ✨ Features
