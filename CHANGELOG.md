@@ -5,6 +5,21 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.2.2] - 2025-11-28
+
+### 🔧 Chore
+- **Tipo:** `chore`
+- **Escopo:** `(ci)`
+- **Descrição:** Integração do linter **Ruff** ao pipeline de GitHub Actions para garantir qualidade de código e estilo.
+- **Tipo:** `chore`
+- **Escopo:** `(deps)`
+- **Descrição:** Adição de `ruff` às dependências de desenvolvimento (`requirements.txt`).
+
+### 📝 Documentation
+- **Tipo:** `docs`
+- **Escopo:** `(ci)`
+- **Descrição:** Atualização do `README.md` com detalhes sobre o pipeline de CI (Linting + Testes + Cobertura) e CD (Render).
+
 ## [v1.2.1] - 2025-11-28
 
 ### 🐛 Bug Fixes

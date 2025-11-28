@@ -99,7 +99,17 @@ Isso irá executar:
 
 ## CI/CD
 
-Este projeto está preparado para integração contínua. A estrutura de testes garante que alterações na lógica de datas ou processamento sejam validadas antes do deploy.
+Este projeto utiliza **GitHub Actions** para automação de CI. O workflow (`.github/workflows/ci.yml`) é acionado em todo *push* e *pull request* para a branch `main` e executa:
+
+1.  **Linting:** Verificação de estilo e erros estáticos com **Ruff**.
+2.  **Testes:** Execução de testes unitários e de integração com **Pytest**.
+3.  **Cobertura:** Verificação se a cobertura de código é de pelo menos **80%**.
+
+### Deploy Contínuo
+
+O deploy é gerenciado pelo **Render.com** via Blueprint (`render.yaml`).
+*   O Render monitora a branch `main`.
+*   Após um push bem-sucedido (e idealmente após a aprovação do CI), o Render constrói o container Docker e atualiza o serviço.
 
 ## Convenções de Commit
 
