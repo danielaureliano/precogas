@@ -5,6 +5,24 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.7.0] - 2025-11-28
+
+### ✨ Features
+- **Tipo:** `feat`
+- **Escopo:** `(core)`
+- **Descrição:** Refatoração do sistema de logs para utilizar **`structlog`** com output JSON estruturado, incluindo `timestamp`, `level`, `module`, `filename`, `lineno`, `func_name` e `trace_id`.
+- **Impacto:** Melhora significativamente a observabilidade, depuração e integração com sistemas de monitoramento/logs centralizados.
+
+- **Tipo:** `feat`
+- **Escopo:** `(api)`
+- **Descrição:** Implementação de métricas **Prometheus** (`requests_total` e `response_time_seconds`) via middleware, expostas no novo endpoint `/metrics`.
+- **Impacto:** Permite monitoramento granular do desempenho e uso da API.
+
+### 🐛 Bug Fixes
+- **Tipo:** `fix`
+- **Escopo:** `(api)`
+- **Descrição:** Correção nos testes do `test_api.py` e `app/main.py` para compatibilidade com o novo comportamento do `structlog` e formato de `content-type` das métricas.
+
 ## [v1.6.0] - 2025-11-28
 
 ### ♻️ Refactor

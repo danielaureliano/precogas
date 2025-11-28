@@ -48,3 +48,18 @@ def test_obter_precos_falha_download(mock_baixar):
     assert response.status_code == status.HTTP_503_SERVICE_UNAVAILABLE # A API agora retorna 503
     assert "erro" in response.json()
     assert response.json()["erro"] == "Arquivo não encontrado no site da ANP"
+
+def test_metrics_endpoint():
+    """
+    Testa o endpoint /metrics.
+    Verifica se retorna 200 OK e se o conteúdo é texto puro com métricas Prometheus.
+    """
+    response = client.get("/metrics")
+
+    assert response.status_code == 200
+    assert "text/plain" in response.headers["content-type"]
+    assert "charset=utf-8" in response.headers["content-type"]
+    assert "# HELP http_requests_total Total HTTP Requests" in response.text
+    assert "# TYPE http_requests_total counter" in response.text
+    assert "# HELP http_response_time_seconds HTTP Response Time" in response.text
+    assert "# TYPE http_response_time_seconds histogram" in response.text
