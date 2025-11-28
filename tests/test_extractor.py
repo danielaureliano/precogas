@@ -12,7 +12,7 @@ def test_extrair_dados_sucesso(mock_excel_file):
     # Mock da leitura do Excel
     mock_instance = mock_excel_file.return_value
     mock_instance.sheet_names = ["ESTADOS"]
-    
+
     # Mock do DataFrame retornado pelo parse
     data = {
         "ESTADOS": ["DISTRITO FEDERAL", "SAO PAULO"],
@@ -49,7 +49,7 @@ def test_extrair_dados_produto_nao_encontrado(mock_excel_file):
     """
     mock_instance = mock_excel_file.return_value
     mock_instance.sheet_names = ["ESTADOS"]
-    
+
     data = {
         "ESTADOS": ["SAO PAULO"], # Sem DF
         "PRODUTO": ["GASOLINA COMUM"],
