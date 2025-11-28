@@ -65,16 +65,24 @@ Todo código gerado, refatorado ou revisado deve seguir estritamente estas regra
 *   **Princípios:** Seguir **SOLID**, **KISS** (Simplicidade) e **DRY** (Não repetir código).
 *   **Código Idiomático:** Escrever código Pythonico (PEP 8), priorizando legibilidade.
 *   **Tipagem:** Utilizar **Tipagem Estática** (`type hints`) em todas as assinaturas de função e classe.
+*   **Manipulação de Arquivos:** Usar a biblioteca `pathlib` para todas as manipulações de caminho.
+*   **Performance (ETL):** Priorizar vetorização (NumPy/Pandas) para processamento de dados, evitando loops Python.
+*   **Configuração Externa:** Utilizar arquivos YAML ou outros formatos para regras de negócio complexas.
+
 
 ### 2. Robustez e Segurança
 *   **Validação:** Implementar validações robustas de dados (entrada/saída).
 *   **Exceções:** Tratamento explícito de exceções (`try/except` específicos). Evitar `except Exception` genérico silencioso.
 *   **Segredos:** **JAMAIS** commitar credenciais, chaves ou senhas. Usar variáveis de ambiente.
+*   **Verificação de Recursos (Startup Check):** No `main.py` ou `downloader.py`, implementar verificações explícitas de conectividade (internet), disponibilidade de Redis e permissões de diretórios temporários na inicialização.
+
 
 ### 3. Testes e Documentação
 *   **Testes:** Todo código novo deve ter testes unitários e/ou de integração (Pytest). Manter cobertura >= 80%.
 *   **Docstrings:** Documentar todas as funções, classes e módulos com docstrings claras (Google ou NumPy style).
 *   **Linting:** O código deve passar por verificação de estilo e qualidade.
+*   **Documentação Contínua:** `README.md`, `CHANGELOG.md` e `TODO.md` devem ser atualizados no mesmo commit/PR das mudanças relevantes no código.
+
 
 ### 4. Ciclo de Vida e Versionamento
 *   **Commits:** Seguir estritamente o padrão **Conventional Commits**:
@@ -86,12 +94,17 @@ Todo código gerado, refatorado ou revisado deve seguir estritamente estas regra
     [rodapé opcional - ex: BREAKING CHANGE, Closes #123]
     ```
     *   **Tipos Permitidos:** `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`.
+*   **Sincronização de Dependências:** O `requirements.txt` (ou equivalente) deve ser atualizado e verificado em todo commit/PR que introduza ou altere dependências.
+*   **Estratégia de Branches:** Utilizar um fluxo claro como Git Flow ou Trunk-Based Development, com `main` sendo sempre estável e `develop` (ou feature branches) para o desenvolvimento.
 *   **Documentação e Versionamento:**
     *   Atualizar `README.md` e `CHANGELOG.md` (preferencialmente automático) ao liberar versões.
     *   Utilizar tags Git semânticas (`vX.Y.Z`).
     *   O versionamento deve ser guiado pelos commits (CI/CD) para determinar major/minor/patch.
 *   **CI/CD:** O código deve passar pelo pipeline de integração contínua (testes automatizados) antes de ser integrado à branch principal.
 *   **Push:** Qualquer comando `git push` requer **autorização explícita** do usuário antes de ser executado.
+
+### 5. Estilo de Interação do Agente
+*   **Abordagem "Code-First":** O agente deve priorizar a entrega de código funcional antes de explicações teóricas.
 
 ## 📝 Roadmap (TODO)
 Conforme `TODO.md`:
