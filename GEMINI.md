@@ -79,6 +79,7 @@ Todo código gerado, refatorado ou revisado deve seguir estritamente estas regra
 ### 4. Ciclo de Vida e Versionamento
 *   **Commits:** Usar **Conventional Commits** (`feat:`, `fix:`, `docs:`, `test:`, `chore:`).
 *   **CI/CD:** O código deve passar pelo pipeline de integração contínua (testes automatizados) antes de ser integrado à branch principal.
+*   **Push:** Qualquer comando `git push` requer **autorização explícita** do usuário antes de ser executado.
 
 ## 📝 Roadmap (TODO)
 Conforme `TODO.md`:
