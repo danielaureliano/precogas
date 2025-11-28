@@ -19,7 +19,7 @@ def test_obter_precos_sucesso(mock_extrair, mock_baixar):
         "2025-01-07",
         "./dados_anp/file.xlsx"
     )
-    
+
     mock_extrair.return_value = {
         "dataInicial": "01/01/2025",
         "dataFinal": "07/01/2025",

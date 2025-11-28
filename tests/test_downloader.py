@@ -46,7 +46,7 @@ def test_baixar_arquivo_sucesso(mock_redis, mock_exists, mock_open, mock_makedir
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.content = b"conteudo_falso_excel"
-    
+
     session_instance = mock_session.return_value
     session_instance.get.return_value = mock_response
 
@@ -57,7 +57,7 @@ def test_baixar_arquivo_sucesso(mock_redis, mock_exists, mock_open, mock_makedir
     assert url is not None
     assert "resumo_semanal_lpc" in url
     assert caminho is not None
-    
+
     # Garante que tentou criar o diretório
     mock_makedirs.assert_called()
     # Garante que tentou escrever o arquivo
@@ -79,7 +79,7 @@ def test_baixar_arquivo_falha_404(mock_redis, mock_exists, mock_session):
     # Simula erro 404 em todas as tentativas
     mock_response = MagicMock()
     mock_response.status_code = 404
-    
+
     session_instance = mock_session.return_value
     session_instance.get.return_value = mock_response
 
