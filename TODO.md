@@ -1,21 +1,14 @@
-# TODO: Melhorias no PrecoGas
+# Roadmap e Tarefas (TODO)
 
-## 🚀 Roadmap (Planejado)
-
-- [ ] **Funcionalidade:** Adicionar suporte a outros estados (parametrização na URL).
-- [ ] **Qualidade:** Criar testes automatizados (Unitários e Integração).
-- [ ] **CI/CD:** Configurar execução efetiva dos testes no GitHub Actions (workflow criado, falta implementação dos testes).
+## 🚀 Em Andamento
+- [ ] **Segurança:** Monitorar e corrigir vulnerabilidades apontadas pelo Dependabot.
+- [ ] **Funcionalidade:** Adicionar suporte a outros estados na API (parâmetro via URL, hoje fixo em DF).
 
 ## ✅ Concluído
-
-### 📄 Documentação
-- [x] Padronizar documentação do projeto (README, LICENSE, SECURITY).
-- [x] Adicionar instruções de Contribuição, Licença e CI/CD no README.
-- [x] Criar guia de execução local e via Docker.
-
-### ⚙️ Backend & Infra
-- [x] **Performance:** Implementar lógica de cache com Redis na aplicação Python para evitar downloads/processamentos repetidos.
-- [x] Corrigir extração de dados da planilha (considerando cabeçalho na linha 10).
-- [x] Implementar fallback automático: busca semanas anteriores se a atual falhar.
-- [x] Adicionar orquestração de containers (Docker Compose) para API e Redis.
-- [x] Configurar tratamento de SSL para downloads em ambiente de desenvolvimento.
+- [x] **Testes:** Suíte completa (Unitários, Integração) com cobertura de **87%**.
+- [x] **CI/CD:** Workflow do GitHub Actions configurado para testes automatizados (`pytest`).
+- [x] **Qualidade:** Cobertura de código > 80% garantida via `pytest-cov`.
+- [x] **Cache:** Implementação de sistema de cache (Redis).
+- [x] **Deploy:** Configuração para deploy automatizado no Render.com.
+- [x] **Correção:** Ajuste na extração de dados e URLs da ANP.
+- [x] **Infra:** Configuração de Docker Compose.
