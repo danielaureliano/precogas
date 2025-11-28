@@ -12,3 +12,5 @@ pytest-cov
 httpx
 ruff
 pre-commit
+structlog
+prometheus-client
