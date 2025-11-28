@@ -5,6 +5,14 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.4.0] - 2025-11-28
+
+### ♻️ Refactor
+- **Tipo:** `refactor`
+- **Escopo:** `(core)`
+- **Descrição:** Implementação de um módulo de log centralizado (`app/services/logger.py`) e substituição de todos os `print()` nos serviços `downloader`, `extractor` e `main` por chamadas de log padronizadas (INFO, WARNING, ERROR).
+- **Impacto:** Melhora a observabilidade, depuração e auditoria da aplicação.
+
 ## [v1.3.1] - 2025-11-28
 
 ### 🔧 Chore

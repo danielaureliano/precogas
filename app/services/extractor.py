@@ -1,11 +1,14 @@
 import pandas as pd
+from app.services.logger import setup_logger
+
+logger = setup_logger(__name__)
 
 def extrair_dados(caminho_arquivo):
     try:
         excel_data = pd.ExcelFile(caminho_arquivo)
 
         if "ESTADOS" not in excel_data.sheet_names:
-            print("A aba 'ESTADOS' não foi encontrada na planilha.")
+            logger.error("A aba 'ESTADOS' não foi encontrada na planilha.")
             return None
 
         # Ajuste: Ignorar as 9 primeiras linhas e definir a linha 10 como cabeçalho
@@ -22,7 +25,7 @@ def extrair_dados(caminho_arquivo):
         ]
 
         if df_filtrado.empty:
-            print("Nenhum dado encontrado para GASOLINA COMUM no DISTRITO FEDERAL.")
+            logger.warning("Nenhum dado encontrado para GASOLINA COMUM no DISTRITO FEDERAL.")
             return None
 
         # 🔹 Mapeando os nomes das chaves para o novo formato
@@ -36,5 +39,5 @@ def extrair_dados(caminho_arquivo):
         return dados_formatados
 
     except Exception as e:
-        print(f"Erro ao processar o arquivo: {e}")
+        logger.error(f"Erro ao processar o arquivo: {e}")
     return None
