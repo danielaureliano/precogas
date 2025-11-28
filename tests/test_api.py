@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 from unittest.mock import patch
 from app.main import app
+from fastapi import status # Importar status
 
 client = TestClient(app)
 
@@ -28,7 +29,7 @@ def test_obter_precos_sucesso(mock_extrair, mock_baixar):
 
     response = client.get("/precos")
 
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert data["precoMedioRevenda"] == 5.99
     assert data["dataInicial"] == "01/01/2025"
@@ -37,13 +38,13 @@ def test_obter_precos_sucesso(mock_extrair, mock_baixar):
 def test_obter_precos_falha_download(mock_baixar):
     """
     Testa o comportamento da API quando o download falha.
-    Deve retornar um JSON com chave 'erro'.
+    Deve retornar um JSON com chave 'erro' e status 503.
     """
     # Simula falha no download (retorna None no caminho)
     mock_baixar.return_value = (None, None, None, None)
 
     response = client.get("/precos")
 
-    assert response.status_code == 200 # A API retorna 200 com JSON de erro por design atual
+    assert response.status_code == status.HTTP_503_SERVICE_UNAVAILABLE # A API agora retorna 503
     assert "erro" in response.json()
     assert response.json()["erro"] == "Arquivo não encontrado no site da ANP"
