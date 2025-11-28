@@ -5,6 +5,21 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.3.0] - 2025-11-28
+
+### ✨ Features
+- **Tipo:** `feat`
+- **Escopo:** `(dev-xp)`
+- **Descrição:** Implementação de **Git Hooks** locais via `pre-commit`.
+    *   Linting automático com **Ruff** antes de cada commit.
+    *   Verificações de formatação (trailing whitespace, EOF, YAML).
+- **Impacto:** Aumenta a produtividade ao detectar erros localmente e evita que código fora do padrão chegue ao CI.
+
+### 🔧 Chore
+- **Tipo:** `chore`
+- **Escopo:** `(deps)`
+- **Descrição:** Limpeza profunda do `requirements.txt` para remover dependências de ambiente Windows (`pywin32`) e bibliotecas não utilizadas, corrigindo falhas no CI Linux.
+
 ## [v1.2.2] - 2025-11-28
 
 ### 🔧 Chore
