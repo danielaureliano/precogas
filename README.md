@@ -4,9 +4,13 @@
 
 ## Funcionalidades
 
-- Faz o download automático dos arquivos de levantamento de preços disponibilizados pela ANP.
-- Extrai informações específicas da planilha, como **preço médio de revenda** para gasolina comum no Distrito Federal.
-- Fornece um endpoint para consulta via API.
+- **Monitoramento Automático:** Baixa automaticamente os arquivos semanais de levantamento de preços da ANP (formato XLSX).
+- **Resiliência:**
+  - Suporta o novo padrão de URL da ANP (períodos de Segunda a Domingo).
+  - Implementa tentativas automáticas (retries) em caso de falhas de rede.
+  - Possui *fallback* automático para verificação SSL (tenta HTTPS padrão, mas aceita certificados inválidos se necessário, contornando problemas comuns em sites governamentais).
+- **Cache:** Utiliza Redis para armazenar os arquivos baixados até a próxima atualização (domingo), economizando recursos.
+- **API JSON:** Fornece um endpoint simples para integração.
 
 ## Estrutura do Projeto
 
@@ -15,118 +19,88 @@ precogas/
 ├── app/
 │   ├── main.py                 # Ponto de entrada da aplicação (Definição da API)
 │   ├── services/
-│   │   ├── downloader.py       # Lógica de raspagem e download dos arquivos da ANP
-│   │   └── extractor.py        # Lógica de processamento da planilha Excel (Pandas)
+│   │   ├── downloader.py       # Lógica de download, retry, SSL fallback e cache
+│   │   └── extractor.py        # Processamento da planilha Excel (Pandas)
 │   └── __init__.py
-├── dados_anp/                  # Diretório para armazenamento temporário das planilhas baixadas
-├── docker-compose.yml          # Orquestração dos serviços (API + Redis)
-├── requirements.txt            # Dependências do projeto
-├── README.md                   # Documentação geral
-└── TODO.md                     # Lista de tarefas e melhorias futuras
+├── dados_anp/                  # Armazenamento temporário das planilhas
+├── tests/                      # Testes automatizados
+├── docker-compose.yml          # Orquestração (API + Redis)
+├── requirements.txt            # Dependências
+├── README.md                   # Documentação
+└── TODO.md                     # Roadmap
 ```
 
 ## Endpoints
 
 ### `/precos` [GET]
 
-Retorna as informações mais recentes do preço médio de gasolina comum no Distrito Federal:
+Retorna as informações mais recentes do preço médio de gasolina comum no Distrito Federal.
 
-- **DATA INICIAL**
-- **DATA FINAL**
-- **PREÇO MÉDIO REVENDA**
-
-### Exemplo de Resposta
+#### Exemplo de Resposta
 
 ```json
 {
-  "DATA INICIAL": "2025-01-19",
-  "DATA FINAL": "2025-01-25",
-  "PREÇO MÉDIO REVENDA": 5.659
+  "dataInicial": "2025-01-19",
+  "dataFinal": "2025-01-25",
+  "precoMedioRevenda": 5.659
 }
-
-#### Exemplo de Requisição com `curl`
-```bash
-curl http://localhost:8000/precos
 ```
-
 
 ## Como Executar
 
-O projeto pode ser executado localmente ou utilizando Docker/Docker Compose para facilitar o gerenciamento de dependências.
-
-### 1. Clone o repositório:
-```bash
-git clone https://github.com/danielaureliano/precogas/
-cd precogas
-```
-
 ### Via Docker (Recomendado)
 
-Esta é a forma recomendada de executar o PrecoGas, pois gerencia automaticamente a API e a instância do Redis.
+A forma mais simples, pois gerencia a API e o Redis automaticamente.
 
 1.  **Certifique-se de ter Docker e Docker Compose instalados.**
 2.  **Na raiz do projeto, execute:**
     ```bash
     docker-compose up --build
     ```
-    Isso irá construir as imagens e iniciar os serviços da API e do Redis.
 
 A API estará disponível em: `http://localhost:8000/precos`
-Para ver a documentação interativa, acesse: `http://localhost:8000/docs`
 
 ### Execução Local
 
-Para executar a aplicação diretamente em seu ambiente local:
-
-1.  **Crie e ative um ambiente virtual (opcional, mas recomendado):**
+1.  **Crie e ative um ambiente virtual:**
     ```bash
     python -m venv venv
+    # Windows:
     .\venv\Scripts\activate
+    # Linux/Mac:
+    source venv/bin/activate
     ```
 2.  **Instale as dependências:**
     ```bash
     pip install -r requirements.txt
     ```
-3.  **Inicie uma instância do Redis:**
-    Certifique-se de ter o Redis instalado e rodando em `localhost:6379`, ou inicie-o via Docker:
-    ```bash
-    docker run -d --name redis-local -p 6379:6379 redis
-    ```
+3.  **Configure o Redis:**
+    O projeto espera um Redis rodando em `localhost:6379` (padrão).
+    *Se o Redis não estiver disponível, o sistema funcionará, mas sem cache, baixando o arquivo a cada requisição.*
 4.  **Execute a aplicação:**
     ```bash
     uvicorn app.main:app --reload
     ```
 
-A API estará disponível em: `http://localhost:8000/precos`
-Para ver a documentação interativa, acesse: `http://localhost:8000/docs`
+## Testes
 
----
+O projeto utiliza `pytest` para testes unitários e de integração.
+
+Para executar os testes:
+
+```bash
+pytest
+```
+
+Isso irá executar:
+- Testes da lógica de datas e URLs (mockando o tempo).
+- Testes de download (mockando requisições HTTP e sistema de arquivos).
+- Testes do endpoint `/precos` (simulando chamadas à API).
 
 ## CI/CD
 
-Este projeto utiliza **GitHub Actions** para automação de CI/CD. Os workflows são configurados para:
-
-*   Executar testes automatizados em cada *push* e *pull request*.
-*   Realizar *deploy* automático para o Render.com na branch `main`.
-
-Para mais detalhes, consulte os arquivos em `.github/workflows/`.
-
-## Testes
-
-No momento, o projeto **não possui testes automatizados** implementados. Esta é uma das próximas melhorias planejadas, conforme indicado no `TODO.md`.
-
-## Contribuição
-
-Agradecemos o seu interesse em contribuir com o PrecoGas! Siga os passos abaixo para começar:
-
-1.  **Faça um Fork** do repositório.
-2.  **Clone** o seu fork: `git clone https://github.com/SEU_USUARIO/precogas.git`
-3.  Crie uma **branch** para a sua funcionalidade ou correção: `git checkout -b feature/minha-nova-funcionalidade`
-4.  Certifique-se de que o seu ambiente de desenvolvimento esteja configurado e que todos os **testes** estejam passando.
-5.  Faça suas alterações e **commit** com uma mensagem clara e descritiva (utilizando o padrão Conventional Commits).
-6.  Envie suas alterações para o seu fork: `git push origin feature/minha-nova-funcionalidade`
-7.  Abra um **Pull Request** para a branch `main` deste repositório, descrevendo suas alterações.
+Este projeto está preparado para integração contínua. A estrutura de testes garante que alterações na lógica de datas ou processamento sejam validadas antes do deploy.
 
 ## Licença
 
-Este projeto está licenciado sob a licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais detalhes.
+Este projeto está licenciado sob a licença MIT. Consulte o arquivo [LICENSE.md](LICENSE.md) para mais detalhes.
