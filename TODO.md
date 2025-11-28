@@ -1,12 +1,13 @@
 # Roadmap e Tarefas (TODO)
 
 ## 🚀 Em Andamento
-- [ ] **Segurança:** Monitorar e corrigir vulnerabilidades apontadas pelo Dependabot.
+- (nenhuma)
 
 ## 📋 Pendentes
 - (nenhuma)
 
 ## ✅ Concluído
+- [x] **Segurança:** Monitoramento e correção de vulnerabilidades de dependências (realizado via limpeza e atualização do `requirements.txt`).
 - [x] **Funcionalidade:** Adicionar suporte a outros estados na API (cancelado).
 - [x] **Performance:** Garantir que a extração e transformação de dados em `extractor.py` utilizem estritamente funções vetorizadas do Pandas.
 - [x] **Logs:** Revisão e implementação de logs estruturados (JSON) com `structlog` e integração de métricas Prometheus.
