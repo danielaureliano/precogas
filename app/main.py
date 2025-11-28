@@ -1,14 +1,43 @@
-from fastapi import FastAPI, status
-from fastapi.responses import JSONResponse
+import time
+import uuid
+import structlog.contextvars
+from fastapi import FastAPI, status, Request
+from fastapi.responses import JSONResponse, PlainTextResponse
 from app.services.downloader import baixar_arquivo, redis_client
 from app.services.extractor import extrair_dados
 from app.services.logger import setup_logger
 import requests
-import redis # Adicionando importação de redis
+import redis
+from prometheus_client import Counter, Histogram, generate_latest
 
 logger = setup_logger(__name__)
 
 app = FastAPI()
+
+# Métricas Prometheus
+REQUESTS_TOTAL = Counter("http_requests_total", "Total HTTP Requests", ["method", "endpoint", "status_code"])
+RESPONSE_TIME_SECONDS = Histogram("http_response_time_seconds", "HTTP Response Time", ["method", "endpoint"])
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    """Middleware para registrar tempo de resposta e trace_id."""
+    start_time = time.time()
+
+    # Gerar e vincular um trace_id para a requisição
+    trace_id = str(uuid.uuid4())
+    structlog.contextvars.bind_contextvars(trace_id=trace_id)
+    logger.info("Iniciando requisição", method=request.method, endpoint=request.url.path, trace_id=trace_id)
+
+    response = await call_next(request)
+    process_time = time.time() - start_time
+
+    # Registrar métricas
+    REQUESTS_TOTAL.labels(method=request.method, endpoint=request.url.path, status_code=response.status_code).inc()
+    RESPONSE_TIME_SECONDS.labels(method=request.method, endpoint=request.url.path).observe(process_time)
+
+    logger.info("Finalizando requisição", method=request.method, endpoint=request.url.path, status_code=response.status_code, response_time_sec=process_time, trace_id=trace_id)
+
+    return response
 
 @app.get("/precos")
 async def obter_precos():
@@ -16,20 +45,20 @@ async def obter_precos():
     Endpoint para obter o preço médio de gasolina no Distrito Federal.
     Retorna: DATA INICIAL, DATA FINAL e PREÇO MÉDIO REVENDA.
     """
-    logger.info("Requisição recebida para /precos")
+    logger.info("Processando requisição para /precos")
     # Baixa o arquivo mais recente
     url, data_inicio, data_fim, caminho_arquivo = baixar_arquivo()
     if not caminho_arquivo:
-        logger.error("Arquivo da ANP não encontrado após tentativas de download.")
+        logger.error("Arquivo da ANP não encontrado após tentativas de download.", status="download_failed")
         return JSONResponse(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, content={"erro": "Arquivo não encontrado no site da ANP"})
 
     # Extrai os dados da planilha
     resultado = extrair_dados(caminho_arquivo)
     if not resultado:
-        logger.error("Não foi possível extrair os dados para o Distrito Federal do arquivo baixado.")
+        logger.error("Não foi possível extrair os dados para o Distrito Federal do arquivo baixado.", status="extraction_failed")
         return JSONResponse(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, content={"erro": "Não foi possível extrair os dados para o Distrito Federal"})
 
-    logger.info("Dados extraídos com sucesso para o Distrito Federal.")
+    logger.info("Dados extraídos com sucesso para o Distrito Federal.", status="data_extracted")
     return resultado
 
 @app.get("/health")
@@ -38,7 +67,7 @@ async def health_check():
     Endpoint para verificação de saúde da aplicação.
     Verifica a conectividade com a internet e com o Redis.
     """
-    logger.info("Requisição recebida para /health")
+    logger.info("Processando requisição para /health")
     status_checks = {}
     overall_status = status.HTTP_200_OK
 
@@ -46,28 +75,36 @@ async def health_check():
     try:
         requests.head("https://www.google.com", timeout=5)
         status_checks["internet_connection"] = "OK"
-        logger.info("Verificação de conectividade com a internet: OK")
+        logger.info("Verificação de conectividade com a internet: OK", check="internet")
     except requests.exceptions.RequestException as e:
         status_checks["internet_connection"] = f"FAIL: {e}"
         overall_status = status.HTTP_503_SERVICE_UNAVAILABLE
-        logger.error(f"Verificação de conectividade com a internet: FALHA - {e}")
+        logger.error(f"Verificação de conectividade com a internet: FALHA - {e}", check="internet")
 
     # 2. Verificar conexão com Redis
     if redis_client:
         try:
             redis_client.ping()
             status_checks["redis_connection"] = "OK"
-            logger.info("Verificação de conexão com Redis: OK")
+            logger.info("Verificação de conexão com Redis: OK", check="redis")
         except redis.exceptions.ConnectionError as e:
             status_checks["redis_connection"] = f"FAIL: {e}"
             overall_status = status.HTTP_503_SERVICE_UNAVAILABLE
-            logger.error(f"Verificação de conexão com Redis: FALHA - {e}")
+            logger.error(f"Verificação de conexão com Redis: FALHA - {e}", check="redis")
     else:
         status_checks["redis_connection"] = "WARNING: Redis client not initialized (connection failed at startup)"
-        logger.warning("Verificação de conexão com Redis: Cliente Redis não inicializado.")
+        logger.warning("Verificação de conexão com Redis: Cliente Redis não inicializado.", check="redis")
 
     # 3. Status do serviço principal (a API está de pé)
     status_checks["api_service"] = "OK"
-    logger.info("Verificação do serviço da API: OK")
+    logger.info("Verificação do serviço da API: OK", check="api_service")
 
     return JSONResponse(status_code=overall_status, content={"status": "UP" if overall_status == status.HTTP_200_OK else "DOWN", "checks": status_checks})
+
+@app.get("/metrics", response_class=PlainTextResponse)
+async def metrics():
+    """
+    Endpoint para expor métricas no formato Prometheus.
+    """
+    logger.info("Requisição recebida para /metrics", status="metrics_scrape")
+    return PlainTextResponse(generate_latest().decode("utf-8"))
