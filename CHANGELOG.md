@@ -5,6 +5,28 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.1.0] - 2025-11-27
+
+### 🐛 Bug Fixes
+- **Tipo:** `fix`
+- **Escopo:** `(core)`
+- **Descrição:** Ajuste na lógica de geração de URLs da ANP para suportar o novo formato de datas (Segunda a Domingo) e nomenclatura de arquivos (`DDMMYYYY`).
+- **Impacto:** Restaura o funcionamento do download de arquivos semanais.
+
+### ✨ Features
+- **Tipo:** `feat`
+- **Escopo:** `(core)`
+- **Descrição:** Implementação de `requests.Session` com política de retries automáticos e fallback de verificação SSL (aceita certificados inválidos se necessário).
+- **Impacto:** Maior resiliência contra instabilidades do site `gov.br`.
+
+- **Tipo:** `feat`
+- **Escopo:** `(core)`
+- **Descrição:** Tratamento de erro na conexão com Redis. Se o Redis estiver indisponível, a aplicação continua funcionando sem cache.
+
+- **Tipo:** `feat`
+- **Escopo:** `(tests)`
+- **Descrição:** Adição de suíte de testes automatizados (`pytest`) cobrindo lógica de download e endpoints da API.
+
 ## [v1.0.0] - 2025-11-26
 
 ### 📝 Documentation (Documentação)
