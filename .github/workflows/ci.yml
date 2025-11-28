@@ -37,6 +37,11 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     
+    - name: Lint with Ruff
+      run: |
+        # Fails on errors, warnings are printed
+        ruff check .
+
     - name: Run Tests with Coverage
       env:
         REDIS_URL: redis://localhost:6379
