@@ -5,6 +5,13 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.3.1] - 2025-11-28
+
+### 🔧 Chore
+- **Tipo:** `chore`
+- **Escopo:** `(git)`
+- **Descrição:** Remoção do arquivo `.coverage` do controle de versão para evitar que artefatos de build sejam commitados.
+
 ## [v1.3.0] - 2025-11-28
 
 ### ✨ Features
