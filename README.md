@@ -1,4 +1,8 @@
 # PrecoGas
+[![CI](https://github.com/danielaureliano/precogas/actions/workflows/ci.yml/badge.svg)](https://github.com/danielaureliano/precogas/actions/workflows/ci.yml)
+![Coverage](https://img.shields.io/badge/coverage-87%25%2B-brightgreen)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/danielaureliano/precogas?label=version)
 
 **PrecoGas** é uma API desenvolvida em Python com **FastAPI**, projetada para monitorar e fornecer informações sobre o preço médio de combustíveis no Distrito Federal, com base nos dados publicados pela ANP (Agência Nacional do Petróleo).
 
