@@ -101,6 +101,27 @@ Isso irá executar:
 
 Este projeto está preparado para integração contínua. A estrutura de testes garante que alterações na lógica de datas ou processamento sejam validadas antes do deploy.
 
+## Convenções de Commit
+
+Este projeto adota estritamente o padrão **Conventional Commits**. Todo commit deve seguir a estrutura:
+
+```
+<tipo>(<escopo opcional>): <descrição curta>
+
+[corpo opcional]
+
+[rodapé opcional - ex: BREAKING CHANGE, Closes #123]
+```
+
+### Tipos Permitidos:
+*   `feat`: Nova funcionalidade.
+*   `fix`: Correção de bug.
+*   `docs`: Alterações apenas em documentação.
+*   `style`: Formatação, ponto e vírgula faltando, etc. (não altera lógica).
+*   `refactor`: Refatoração de código (sem nova funcionalidade ou correção de bug).
+*   `test`: Adição ou correção de testes.
+*   `chore`: Atualização de tarefas de build, configs de pacote, etc.
+
 ## Licença
 
 Este projeto está licenciado sob a licença MIT. Consulte o arquivo [LICENSE.md](LICENSE.md) para mais detalhes.

@@ -77,7 +77,19 @@ Todo código gerado, refatorado ou revisado deve seguir estritamente estas regra
 *   **Linting:** O código deve passar por verificação de estilo e qualidade.
 
 ### 4. Ciclo de Vida e Versionamento
-*   **Commits:** Usar **Conventional Commits** (`feat:`, `fix:`, `docs:`, `test:`, `chore:`).
+*   **Commits:** Seguir estritamente o padrão **Conventional Commits**:
+    ```
+    <tipo>(<escopo opcional>): <descrição curta>
+
+    [corpo opcional]
+
+    [rodapé opcional - ex: BREAKING CHANGE, Closes #123]
+    ```
+    *   **Tipos Permitidos:** `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`.
+*   **Documentação e Versionamento:**
+    *   Atualizar `README.md` e `CHANGELOG.md` (preferencialmente automático) ao liberar versões.
+    *   Utilizar tags Git semânticas (`vX.Y.Z`).
+    *   O versionamento deve ser guiado pelos commits (CI/CD) para determinar major/minor/patch.
 *   **CI/CD:** O código deve passar pelo pipeline de integração contínua (testes automatizados) antes de ser integrado à branch principal.
 *   **Push:** Qualquer comando `git push` requer **autorização explícita** do usuário antes de ser executado.
 
