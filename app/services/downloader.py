@@ -1,6 +1,7 @@
 import os
 import redis
 import requests
+from pathlib import Path
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from datetime import datetime, timedelta
@@ -23,7 +24,7 @@ except redis.exceptions.ConnectionError as e:
     redis_client = None # Desabilita o cliente Redis se a conexão falhar
 
 BASE_URL = "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/arquivos-lpc"
-OUTPUT_DIR = "./dados_anp/"
+OUTPUT_DIR = Path("./dados_anp/")
 
 def calcular_tempo_ate_proximo_domingo():
     """Calcula quantos segundos faltam até o próximo domingo à meia-noite."""
@@ -38,9 +39,6 @@ def gerar_dados_semana(semanas_atras=0):
     A ANP usa períodos de Segunda a Domingo.
     """
     hoje = datetime.now()
-    # Lógica para encontrar o domingo da semana retrasada (base de cálculo)
-    # Se hoje é quinta (27), weekday=3. 8+3=11. 27-11=16 (Domingo da semana anterior).
-    # Queremos a Segunda (17) até Domingo (23).
 
     ultimo_domingo_base = hoje - timedelta(days=hoje.weekday() + 8 + 7*semanas_atras)
 
@@ -85,19 +83,19 @@ def baixar_arquivo():
         url = f"{BASE_URL}/{data_inicio.year}/resumo_semanal_lpc-{str_inicio_url}-a-{str_fim_url}.xlsx"
 
         nome_arquivo = f"resumo_semanal_lpc-{str_inicio_url}-a-{str_fim_url}.xlsx"
-        caminho_arquivo = os.path.join(OUTPUT_DIR, nome_arquivo)
+        caminho_arquivo = OUTPUT_DIR / nome_arquivo
 
         cache_key = f"arquivo_precos:{str_inicio_iso}:{str_fim_iso}"
 
         # Verifica Cache
         if redis_client:
             cached_path = redis_client.get(cache_key)
-            if cached_path and os.path.exists(cached_path):
+            if cached_path and Path(cached_path).exists():
                 logger.info(f"[Cache] Usando arquivo em cache: {cached_path}")
-                return url, str_inicio_iso, str_fim_iso, cached_path
+                return url, str_inicio_iso, str_fim_iso, Path(cached_path)
         else:
             # Se sem redis, verifica se arquivo existe localmente
-            if os.path.exists(caminho_arquivo):
+            if caminho_arquivo.exists():
                  logger.info(f"[Local] Arquivo já existe no disco: {caminho_arquivo}")
                  return url, str_inicio_iso, str_fim_iso, caminho_arquivo
 
@@ -112,13 +110,13 @@ def baixar_arquivo():
                 response = session.get(url, timeout=15, verify=False)
 
             if response.status_code == 200:
-                os.makedirs(OUTPUT_DIR, exist_ok=True)
-                with open(caminho_arquivo, "wb") as f:
+                OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+                with caminho_arquivo.open("wb") as f:
                     f.write(response.content)
 
                 if redis_client:
                     cache_ttl = calcular_tempo_ate_proximo_domingo()
-                    redis_client.setex(cache_key, cache_ttl, caminho_arquivo)
+                    redis_client.setex(cache_key, cache_ttl, str(caminho_arquivo))
                     logger.info(f"[Sucesso] Arquivo baixado e cacheado: {caminho_arquivo}")
                 else:
                     logger.info(f"[Sucesso] Arquivo baixado: {caminho_arquivo}")

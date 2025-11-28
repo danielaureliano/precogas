@@ -1,9 +1,10 @@
 import pandas as pd
+from pathlib import Path
 from app.services.logger import setup_logger
 
 logger = setup_logger(__name__)
 
-def extrair_dados(caminho_arquivo):
+def extrair_dados(caminho_arquivo: str | Path):
     try:
         excel_data = pd.ExcelFile(caminho_arquivo)
 

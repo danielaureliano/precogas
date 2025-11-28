@@ -1,5 +1,5 @@
 from datetime import datetime
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, mock_open
 from app.services.downloader import gerar_dados_semana, baixar_arquivo
 
 def test_gerar_dados_semana():
@@ -27,18 +27,21 @@ def test_gerar_dados_semana():
         assert fim.strftime("%d%m%Y") == "16112025"
 
 @patch("app.services.downloader.requests.Session")
-@patch("app.services.downloader.os.makedirs")
-@patch("app.services.downloader.open")
-@patch("app.services.downloader.os.path.exists")
+@patch("app.services.downloader.OUTPUT_DIR") # Mocka a variável global OUTPUT_DIR
 @patch("app.services.downloader.redis_client")
-def test_baixar_arquivo_sucesso(mock_redis, mock_exists, mock_open, mock_makedirs, mock_session):
+def test_baixar_arquivo_sucesso(mock_redis, mock_output_dir, mock_session):
     """
     Testa o fluxo completo de download com sucesso (HTTP 200).
-    Verifica se o arquivo é salvo e se os diretórios são criados.
-    Ignora cache e disco real.
+    Verifica se o arquivo é salvo usando pathlib.
     """
-    # Garante que não acha nada no cache nem no disco, forçando o download
-    mock_exists.return_value = False
+    # Configura o Mock do OUTPUT_DIR (que é um Path)
+    # Quando fazemos OUTPUT_DIR / "nome", ele chama __truediv__
+    mock_file_path = MagicMock()
+    mock_output_dir.__truediv__.return_value = mock_file_path
+
+    # Garante que não acha nada no cache nem no disco
+    mock_file_path.exists.return_value = False
+
     if mock_redis:
         mock_redis.get.return_value = None
 
@@ -50,6 +53,10 @@ def test_baixar_arquivo_sucesso(mock_redis, mock_exists, mock_open, mock_makedir
     session_instance = mock_session.return_value
     session_instance.get.return_value = mock_response
 
+    # Mock do open() chamado no objeto Path do arquivo
+    m = mock_open()
+    mock_file_path.open = m
+
     # Executa
     url, data_inicio, data_fim, caminho = baixar_arquivo()
 
@@ -58,21 +65,25 @@ def test_baixar_arquivo_sucesso(mock_redis, mock_exists, mock_open, mock_makedir
     assert "resumo_semanal_lpc" in url
     assert caminho is not None
 
-    # Garante que tentou criar o diretório
-    mock_makedirs.assert_called()
+    # Garante que tentou criar o diretório no OUTPUT_DIR
+    mock_output_dir.mkdir.assert_called()
     # Garante que tentou escrever o arquivo
-    mock_open.assert_called()
+    m.assert_called()
+    m().write.assert_called_with(b"conteudo_falso_excel")
 
 @patch("app.services.downloader.requests.Session")
-@patch("app.services.downloader.os.path.exists")
-@patch("app.services.downloader.redis_client") # Mock do objeto redis global
-def test_baixar_arquivo_falha_404(mock_redis, mock_exists, mock_session):
+@patch("app.services.downloader.OUTPUT_DIR")
+@patch("app.services.downloader.redis_client")
+def test_baixar_arquivo_falha_404(mock_redis, mock_output_dir, mock_session):
     """
     Testa o comportamento quando todas as tentativas de download retornam 404.
     Deve retornar None para todos os valores.
     """
-    # Garante que não acha nada no cache nem no disco
-    mock_exists.return_value = False
+    # Configura o Mock do OUTPUT_DIR e do arquivo resultante
+    mock_file_path = MagicMock()
+    mock_output_dir.__truediv__.return_value = mock_file_path
+    mock_file_path.exists.return_value = False
+
     if mock_redis:
         mock_redis.get.return_value = None
 
