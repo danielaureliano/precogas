@@ -1,13 +1,15 @@
 # Roadmap e Tarefas (TODO)
 
 ## 🚀 Em Andamento
-- (nenhuma)
+- [ ] **Startup Check:** Implementar verificação de existência e permissões de escrita no diretório de dados na inicialização da API.
 
 ## 📋 Pendentes
-- (nenhuma)
+- [ ] **Dependências:** Melhorar sincronização de dependências.
+- [ ] **Processo:** Documentar estratégia de branches.
+- [ ] **Configuração:** Implementar configuração externa para regras de ETL (YAML).
 
 ## ✅ Concluído
-- [x] **Segurança:** Monitoramento e correção de vulnerabilidades de dependências (realizado via limpeza e atualização do `requirements.txt`).
+- [x] **Segurança:** Monitoramento e correção de vulnerabilidades de dependências.
 - [x] **Funcionalidade:** Adicionar suporte a outros estados na API (cancelado).
 - [x] **Performance:** Garantir que a extração e transformação de dados em `extractor.py` utilizem estritamente funções vetorizadas do Pandas.
 - [x] **Logs:** Revisão e implementação de logs estruturados (JSON) com `structlog` e integração de métricas Prometheus.
