@@ -86,6 +86,17 @@ A API estará disponível em: `http://localhost:8000/precos`
     uvicorn app.main:app --reload
     ```
 
+## Configuração
+
+A aplicação utiliza **variáveis de ambiente** para configuração (padrão [12-Factor App](https://12factor.net/)).
+
+Você pode definir essas variáveis no seu sistema operacional ou criar um arquivo `.env` na raiz do projeto.
+
+| Variável | Descrição | Padrão |
+| :--- | :--- | :--- |
+| `REDIS_URL` | URL de conexão com o Redis | `redis://localhost:6379` |
+| `ANP_BASE_URL` | URL base para download da ANP | *(URL oficial da ANP)* |
+
 ## Testes
 
 O projeto utiliza `pytest` para testes unitários e de integração.

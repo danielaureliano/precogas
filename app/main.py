@@ -4,9 +4,10 @@ import structlog.contextvars
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, status, Request
 from fastapi.responses import JSONResponse, PlainTextResponse
-from app.services.downloader import baixar_arquivo, redis_client, OUTPUT_DIR
+from app.services.downloader import baixar_arquivo, redis_client
 from app.services.extractor import extrair_dados
 from app.services.logger import setup_logger
+from app.core.config import settings
 import requests
 import redis
 from prometheus_client import Counter, Histogram, generate_latest
@@ -19,24 +20,24 @@ async def lifespan(app: FastAPI):
     logger.info("Iniciando verificações de startup...", status="startup_check_start")
 
     # Verificar diretório de dados
-    if not OUTPUT_DIR.exists():
-        logger.info(f"Diretório {OUTPUT_DIR} não existe. Tentando criar...", status="dir_creation")
+    if not settings.OUTPUT_DIR.exists():
+        logger.info(f"Diretório {settings.OUTPUT_DIR} não existe. Tentando criar...", status="dir_creation")
         try:
-            OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-            logger.info(f"Diretório {OUTPUT_DIR} criado com sucesso.", status="dir_created")
+            settings.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+            logger.info(f"Diretório {settings.OUTPUT_DIR} criado com sucesso.", status="dir_created")
         except Exception as e:
-            logger.error(f"Falha crítica ao criar diretório {OUTPUT_DIR}: {e}", status="dir_creation_failed")
+            logger.error(f"Falha crítica ao criar diretório {settings.OUTPUT_DIR}: {e}", status="dir_creation_failed")
             raise RuntimeError(f"Falha no startup: Não foi possível criar diretório de dados: {e}")
 
     # Verificar permissão de escrita
     try:
-        test_file = OUTPUT_DIR / ".write_test"
+        test_file = settings.OUTPUT_DIR / ".write_test"
         test_file.touch()
         test_file.unlink()
-        logger.info(f"Permissões de escrita em {OUTPUT_DIR} verificadas: OK", status="write_permission_ok")
+        logger.info(f"Permissões de escrita em {settings.OUTPUT_DIR} verificadas: OK", status="write_permission_ok")
     except Exception as e:
-        logger.error(f"Sem permissão de escrita em {OUTPUT_DIR}: {e}", status="write_permission_failed")
-        raise RuntimeError(f"Falha no startup: Sem permissão de escrita em {OUTPUT_DIR}")
+        logger.error(f"Sem permissão de escrita em {settings.OUTPUT_DIR}: {e}", status="write_permission_failed")
+        raise RuntimeError(f"Falha no startup: Sem permissão de escrita em {settings.OUTPUT_DIR}")
 
     logger.info("Verificações de startup concluídas com sucesso.", status="startup_check_success")
     yield

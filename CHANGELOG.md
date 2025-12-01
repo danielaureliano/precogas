@@ -5,6 +5,17 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.9.0] - 2025-12-01
+
+### ⚠ BREAKING CHANGE
+- **Configuração:** A aplicação agora utiliza `pydantic-settings` para gerenciamento de configuração. As variáveis de ambiente (como `REDIS_URL`) devem ser definidas corretamente no ambiente ou em um arquivo `.env`. Constantes hardcoded foram removidas.
+
+### ♻️ Refactor
+- **Tipo:** `refactor`
+- **Escopo:** `(core)`
+- **Descrição:** Centralização das configurações da aplicação (URLs, caminhos, credenciais) no módulo `app.core.config`. Substituição de `os.getenv` e constantes espalhadas por acesso via objeto `settings` tipado.
+- **Impacto:** Facilita a gestão de variáveis de ambiente, validação de configurações e testes.
+
 ## [v1.8.0] - 2025-11-28
 
 ### ✨ Features
