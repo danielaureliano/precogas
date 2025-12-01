@@ -2,11 +2,12 @@ import pandas as pd
 import yaml
 from pathlib import Path
 from app.services.logger import setup_logger
+from app.core.config import settings
 
 logger = setup_logger(__name__)
 
 # Carregar configurações de ETL
-CONFIG_PATH = Path("config/etl_rules.yaml")
+CONFIG_PATH = settings.ETL_CONFIG_PATH
 ETL_CONFIG = {}
 
 try:

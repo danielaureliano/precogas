@@ -1,4 +1,3 @@
-import os
 import redis
 import requests
 from pathlib import Path
@@ -6,16 +5,14 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from datetime import datetime, timedelta
 from app.services.logger import setup_logger
+from app.core.config import settings
 
 logger = setup_logger(__name__)
-
-#Pegamos a URL do Redis da variável de ambiente
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
 
 # Conexão com Redis (container rodando no Docker)
 redis_client = None
 try:
-    redis_client = redis.Redis.from_url(REDIS_URL, decode_responses=True)
+    redis_client = redis.Redis.from_url(settings.REDIS_URL, decode_responses=True)
     # Testa a conexão
     redis_client.ping()
     logger.info("Conectado ao Redis com sucesso!")
@@ -23,8 +20,8 @@ except redis.exceptions.ConnectionError as e:
     logger.warning(f"Não foi possível conectar ao Redis: {e}. O caching será desabilitado.")
     redis_client = None # Desabilita o cliente Redis se a conexão falhar
 
-BASE_URL = "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/arquivos-lpc"
-OUTPUT_DIR = Path("./dados_anp/")
+BASE_URL = settings.ANP_BASE_URL
+OUTPUT_DIR = settings.OUTPUT_DIR
 
 def calcular_tempo_ate_proximo_domingo():
     """Calcula quantos segundos faltam até o próximo domingo à meia-noite."""

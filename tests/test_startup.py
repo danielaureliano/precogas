@@ -3,8 +3,11 @@ from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 from app.main import app
 
-@patch("app.main.OUTPUT_DIR")
-def test_startup_check_success(mock_output_dir):
+@patch("app.main.settings") # Mocka settings
+def test_startup_check_success(mock_settings):
+    # Configura o Mock do OUTPUT_DIR
+    mock_output_dir = mock_settings.OUTPUT_DIR
+
     # Simula diretório inexistente, mas cria com sucesso
     mock_output_dir.exists.return_value = False
 
@@ -18,8 +21,9 @@ def test_startup_check_success(mock_output_dir):
         mock_file.touch.assert_called()
         mock_file.unlink.assert_called()
 
-@patch("app.main.OUTPUT_DIR")
-def test_startup_check_fail_permission(mock_output_dir):
+@patch("app.main.settings")
+def test_startup_check_fail_permission(mock_settings):
+    mock_output_dir = mock_settings.OUTPUT_DIR
     mock_output_dir.exists.return_value = True
 
     # Simula erro ao criar arquivo de teste (sem permissão)

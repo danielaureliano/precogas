@@ -27,14 +27,13 @@ def test_gerar_dados_semana():
         assert fim.strftime("%d%m%Y") == "16112025"
 
 @patch("app.services.downloader.requests.Session")
-@patch("app.services.downloader.OUTPUT_DIR") # Mocka a variável global OUTPUT_DIR
+@patch("app.services.downloader.OUTPUT_DIR") # Mocka a variável global OUTPUT_DIR diretamente
 @patch("app.services.downloader.redis_client")
 def test_baixar_arquivo_sucesso(mock_redis, mock_output_dir, mock_session):
     """
     Testa o fluxo completo de download com sucesso (HTTP 200).
     Verifica se o arquivo é salvo usando pathlib.
     """
-    # Configura o Mock do OUTPUT_DIR (que é um Path)
     # Quando fazemos OUTPUT_DIR / "nome", ele chama __truediv__
     mock_file_path = MagicMock()
     mock_output_dir.__truediv__.return_value = mock_file_path
