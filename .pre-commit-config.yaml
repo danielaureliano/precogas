@@ -12,3 +12,13 @@ repos:
     hooks:
       - id: ruff
         args: [ --fix, --exit-non-zero-on-fix ]
+
+  - repo: local
+    hooks:
+      - id: check-deps
+        name: Check Dependencies
+        entry: python scripts/check_deps.py
+        language: system
+        types: [python]
+        pass_filenames: false
+        always_run: true

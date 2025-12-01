@@ -14,3 +14,4 @@ ruff
 pre-commit
 structlog
 prometheus-client
+pyyaml

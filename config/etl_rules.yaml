@@ -1,0 +1,12 @@
+anp:
+  sheet_name: "ESTADOS"
+  header_row: 9 # 0-based index (linha 10 do Excel)
+  filters:
+    estado_col: "ESTADOS"
+    estado_val: "DISTRITO FEDERAL"
+    produto_col: "PRODUTO"
+    produto_val: "GASOLINA COMUM"
+  output_columns:
+    data_inicial: "DATA INICIAL"
+    data_final: "DATA FINAL"
+    preco_medio: "PREÇO MÉDIO REVENDA"
