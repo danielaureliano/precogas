@@ -5,6 +5,29 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.8.0] - 2025-11-28
+
+### ✨ Features
+- **Tipo:** `feat`
+- **Escopo:** `(startup)`
+- **Descrição:** Implementação de Startup Checks na inicialização da aplicação para verificar a existência e permissões de escrita do diretório de dados (`dados_anp/`). A aplicação falha rápido se o diretório não puder ser criado ou não for gravável.
+- **Impacto:** Garante a integridade e disponibilidade do sistema, evitando falhas em tempo de execução.
+
+- **Tipo:** `feat`
+- **Escopo:** `(dev-xp)`
+- **Descrição:** Adição de script de verificação de dependências (`scripts/check_deps.py`) integrado ao `pre-commit` para garantir sincronia entre ambiente e `requirements.txt`.
+
+### ♻️ Refactor
+- **Tipo:** `refactor`
+- **Escopo:** `(etl)`
+- **Descrição:** Refatoração do `extractor.py` para usar um arquivo de configuração externo (`config/etl_rules.yaml`) para as regras de extração (nome da aba, linha do cabeçalho, filtros de estado/produto, colunas de saída).
+- **Impacto:** Aumenta a flexibilidade e manutenibilidade da lógica de extração, desacoplando regras de negócio do código.
+
+### 📝 Documentation
+- **Tipo:** `docs`
+- **Escopo:** `(process)`
+- **Descrição:** Criação do `CONTRIBUTING.md` detalhando a estratégia de branches (Feature Branches) e fluxo de contribuição.
+
 ## [v1.7.0] - 2025-11-28
 
 ### ✨ Features
