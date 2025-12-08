@@ -5,6 +5,21 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.10.0] - 2025-12-08
+
+### ♻️ Refactor
+- **Tipo:** `refactor`
+- **Escopo:** `(etl)`
+- **Descrição:** Implementação de validação estrita de schema e tipos na função `extrair_dados` (`extractor.py`). Agora verifica a existência de abas, colunas obrigatórias e tipos de dados (float) antes de processar, aumentando a resiliência contra mudanças no layout da planilha da ANP.
+
+### 🔧 Chore
+- **Tipo:** `chore`
+- **Escopo:** `(deps)`
+- **Descrição:** Atualização das dependências do projeto (`fastapi`, `pandas`, `pytest`, `ruff`, etc.) para as versões estáveis mais recentes.
+- **Tipo:** `chore`
+- **Escopo:** `(docs)`
+- **Descrição:** Atualização do `GEMINI.md` com instruções de segurança para verificação de vulnerabilidades no contexto do projeto.
+
 ## [v1.9.0] - 2025-12-01
 
 ### ⚠ BREAKING CHANGE

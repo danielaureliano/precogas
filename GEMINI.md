@@ -103,6 +103,7 @@ Todo código gerado, refatorado ou revisado deve seguir estritamente estas regra
     *   O versionamento deve ser guiado pelos commits (CI/CD) para determinar major/minor/patch.
 *   **CI/CD:** O código deve passar pelo pipeline de integração contínua (testes automatizados) antes de ser integrado à branch principal.
 *   **Push:** Qualquer comando `git push` requer **autorização explícita** do usuário antes de ser executado.
+*   **Verificação de Dependências:** Ao verificar vulnerabilidades e desatualizações, SEMPRE instale as dependências do `requirements.txt` (ou arquivo similar) primeiro no ambiente de execução do comando (`pip install -r requirements.txt`). Em seguida, utilize ferramentas como `pip-audit -r requirements.txt` e compare os resultados EXCLUSIVAMENTE com as dependências do projeto.
 
 ### 5. Estilo de Interação do Agente
 *   **Abordagem "Code-First":** O agente deve priorizar a entrega de código funcional antes de explicações teóricas.

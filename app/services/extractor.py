@@ -32,43 +32,68 @@ def extrair_dados(caminho_arquivo: str | Path):
         sheet = anp_conf.get("sheet_name", "ESTADOS")
 
         if sheet not in excel_data.sheet_names:
-            logger.error(f"A aba '{sheet}' não foi encontrada na planilha.")
+            logger.error(f"Schema Error: A aba '{sheet}' não foi encontrada na planilha. Abas disponíveis: {excel_data.sheet_names}")
             return None
 
         # Ajuste: Ignorar as 9 primeiras linhas e definir a linha 10 como cabeçalho
         header_row = anp_conf.get("header_row", 9)
+
+        # Validação básica do header_row
+        if not isinstance(header_row, int) or header_row < 0:
+             logger.error(f"Schema Error: 'header_row' inválido: {header_row}")
+             return None
+
         df_estados = excel_data.parse(sheet, skiprows=header_row)
 
         # Ajuste para garantir que os nomes das colunas estejam corretos
         df_estados.rename(columns=lambda x: str(x).strip(), inplace=True)
 
-        # Filtrar pelo Estado e Produto
+        # Configurações de colunas
         filters = anp_conf.get("filters", {})
         est_col = filters.get("estado_col", "ESTADOS")
-        est_val = filters.get("estado_val", "DISTRITO FEDERAL")
         prod_col = filters.get("produto_col", "PRODUTO")
-        prod_val = filters.get("produto_val", "GASOLINA COMUM")
 
-        df_filtrado = df_estados[
-            (df_estados[est_col].str.upper() == est_val) &
-            (df_estados[prod_col].str.upper() == prod_val)
-        ]
-
-        if df_filtrado.empty:
-            logger.warning(f"Nenhum dado encontrado para {prod_val} no {est_val}.")
-            return None
-
-        # 🔹 Mapeando os nomes das chaves para o novo formato
         cols = anp_conf.get("output_columns", {})
         col_ini = cols.get("data_inicial", "DATA INICIAL")
         col_fim = cols.get("data_final", "DATA FINAL")
         col_preco = cols.get("preco_medio", "PREÇO MÉDIO REVENDA")
 
-        dados = df_filtrado.iloc[0][[col_ini, col_fim, col_preco]].to_dict()
+        # Validação de Schema: Verificar se colunas existem
+        required_cols = {est_col, prod_col, col_ini, col_fim, col_preco}
+        missing_cols = required_cols - set(df_estados.columns)
+        if missing_cols:
+            logger.error(f"Schema Error: Colunas obrigatórias ausentes na planilha: {missing_cols}")
+            return None
+
+        est_val = filters.get("estado_val", "DISTRITO FEDERAL")
+        prod_val = filters.get("produto_val", "GASOLINA COMUM")
+
+        df_filtrado = df_estados[
+            (df_estados[est_col].astype(str).str.upper() == est_val) &
+            (df_estados[prod_col].astype(str).str.upper() == prod_val)
+        ]
+
+        if df_filtrado.empty:
+            logger.warning(f"Data Integrity: Nenhum dado encontrado para {prod_val} no {est_val}.")
+            return None
+
+        # Extração e validação de tipos
+        row = df_filtrado.iloc[0]
+
+        try:
+            # Tentar converter preço para float, tratando vírgula se necessário (padrão PT-BR)
+            preco_raw = row[col_preco]
+            if isinstance(preco_raw, str):
+                preco_raw = preco_raw.replace(',', '.')
+            preco_float = float(preco_raw)
+        except (ValueError, TypeError):
+            logger.error(f"Data Integrity: Valor inválido para preço médio: {row[col_preco]}")
+            return None
+
         dados_formatados = {
-            "dataInicial": dados[col_ini],
-            "dataFinal": dados[col_fim],
-            "precoMedioRevenda": dados[col_preco]
+            "dataInicial": row[col_ini],
+            "dataFinal": row[col_fim],
+            "precoMedioRevenda": preco_float
         }
 
         return dados_formatados
