@@ -3,7 +3,7 @@ import uuid
 import structlog.contextvars
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, status, Request
-from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi.responses import JSONResponse, PlainTextResponse, RedirectResponse
 from app.services.downloader import baixar_arquivo, redis_client
 from app.services.extractor import extrair_dados
 from app.services.logger import setup_logger
@@ -16,6 +16,18 @@ logger = setup_logger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+    Gerenciador de contexto para o ciclo de vida da aplicação (Startup/Shutdown).
+
+    Executa verificações de inicialização críticas:
+    1. Verifica se o diretório de saída para arquivos baixados existe ou pode ser criado.
+    2. Verifica permissões de escrita nesse diretório.
+
+    Se alguma verificação falhar, a aplicação não inicia (RuntimeError).
+
+    Args:
+        app (FastAPI): A instância da aplicação FastAPI.
+    """
     # Startup Check
     logger.info("Iniciando verificações de startup...", status="startup_check_start")
 
@@ -52,7 +64,21 @@ RESPONSE_TIME_SECONDS = Histogram("http_response_time_seconds", "HTTP Response T
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
-    """Middleware para registrar tempo de resposta e trace_id."""
+    """
+    Middleware global para observabilidade.
+
+    1. Gera um `trace_id` único para cada requisição.
+    2. Calcula o tempo de processamento.
+    3. Registra logs estruturados (Início/Fim).
+    4. Coleta métricas para o Prometheus.
+
+    Args:
+        request (Request): Objeto da requisição HTTP.
+        call_next (Callable): Função que processa a requisição e retorna a resposta.
+
+    Returns:
+        Response: A resposta HTTP processada.
+    """
     start_time = time.time()
 
     # Gerar e vincular um trace_id para a requisição
@@ -71,11 +97,24 @@ async def add_process_time_header(request: Request, call_next):
 
     return response
 
+@app.get("/", include_in_schema=False)
+async def root():
+    """
+    Redireciona a raiz para a documentação Redoc.
+    """
+    return RedirectResponse(url="/redoc")
+
 @app.get("/precos")
 async def obter_precos():
     """
-    Endpoint para obter o preço médio de gasolina no Distrito Federal.
-    Retorna: DATA INICIAL, DATA FINAL e PREÇO MÉDIO REVENDA.
+    Endpoint principal para consulta de preços.
+
+    Processo:
+    1. Aciona o `baixar_arquivo` para obter a planilha mais recente (com cache).
+    2. Aciona o `extrair_dados` para ler e filtrar as informações do DF.
+
+    Returns:
+        JSONResponse: Dados formatados ou erro 503 se indisponível.
     """
     logger.info("Processando requisição para /precos")
     # Baixa o arquivo mais recente
