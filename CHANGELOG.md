@@ -20,6 +20,11 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Escopo:** `(logging)`
 - **Descrição:** Limpeza de logs de depuração temporários no serviço de download e garantia do nível de log padrão `INFO`.
 
+### ♻️ Refactor
+- **Tipo:** `refactor`
+- **Escopo:** `(etl)`
+- **Descrição:** Explicitação do engine `openpyxl` na leitura de arquivos Excel com Pandas em `extractor.py`, garantindo robustez e compatibilidade com arquivos `.xlsx`.
+
 ## [v1.10.0] - 2025-12-08
 
 ### ♻️ Refactor

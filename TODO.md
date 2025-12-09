@@ -4,9 +4,10 @@
 - (nenhuma)
 
 ## 📋 Pendentes
-- (nenhuma)
+- [ ] **Frontend:** Criar um painel simples (Dashboard) para visualização do histórico de preços.
 
 ## ✅ Concluído
+- [x] **Manutenção:** Correção da configuração do Redis (`REDIS_URL`) no Docker Compose e ajustes de logging.
 - [x] **Startup Check:** Implementar verificação de existência e permissões de escrita no diretório de dados na inicialização da API.
 - [x] **Dependências:** Melhorar sincronização de dependências.
 - [x] **Processo:** Documentar estratégia de branches.
