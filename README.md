@@ -1,169 +1,156 @@
-# PrecoGas
-[![CI](https://github.com/danielaureliano/precogas/actions/workflows/ci.yml/badge.svg)](https://github.com/danielaureliano/precogas/actions/workflows/ci.yml)
-![Coverage](https://img.shields.io/badge/coverage-87%25%2B-brightgreen)
+# PrecoGas API
+
+[![CI Pipeline](https://github.com/DanAureliano/precogas/actions/workflows/ci.yml/badge.svg)](https://github.com/DanAureliano/precogas/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/danielaureliano/precogas?label=version)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Code Style: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 
-**PrecoGas** é uma API desenvolvida em Python com **FastAPI**, projetada para monitorar e fornecer informações sobre o preço médio de combustíveis no Distrito Federal, com base nos dados publicados pela ANP (Agência Nacional do Petróleo).
+API RESTful de alta performance desenvolvida com **FastAPI** para monitoramento automatizado do preço médio da gasolina comum no Distrito Federal. O sistema extrai dados diretamente das planilhas semanais públicas da **ANP** (Agência Nacional do Petróleo).
 
-## Funcionalidades
+---
 
-- **Monitoramento Automático:** Baixa automaticamente os arquivos semanais de levantamento de preços da ANP (formato XLSX).
-- **Resiliência:**
-  - Suporta o novo padrão de URL da ANP (períodos de Segunda a Domingo).
-  - Implementa tentativas automáticas (retries) em caso de falhas de rede.
-  - Possui *fallback* automático para verificação SSL (tenta HTTPS padrão, mas aceita certificados inválidos se necessário, contornando problemas comuns em sites governamentais).
-- **Cache:** Utiliza Redis para armazenar os arquivos baixados até a próxima atualização (domingo), economizando recursos.
-- **API JSON:** Fornece um endpoint simples para integração.
+## 🚀 Funcionalidades Principais
 
-## Estrutura do Projeto
+*   **Extração Automatizada (ETL):** Monitora o site da ANP, identifica e baixa a planilha semanal mais recente.
+*   **API Rápida e Documentada:** Endpoints REST documentados automaticamente (Swagger UI/ReDoc).
+*   **Cache Inteligente:** Utiliza **Redis** para cachear arquivos e respostas, reduzindo latência e tráfego na fonte (ANP).
+*   **Sincronização de Tempo (NTP):** Garante precisão temporal via `pool.ntp.org` para expiração de cache.
+*   **Observabilidade Completa:**
+    *   Logs estruturados em JSON (`structlog`) com Trace ID distribuído.
+    *   Métricas Prometheus nativas (`requests_total`, `response_time`).
+    *   Health checks para dependências (Internet, Redis).
+*   **Resiliência:** Políticas de *Retry* automáticos, Fallbacks de SSL e tratamento robusto de erros.
 
+---
+
+## 🏗️ Arquitetura
+
+O sistema opera em um fluxo contínuo de ETL On-Demand:
+
+1.  **Requisição:** O cliente chama `GET /precos`.
+2.  **Scraper (Downloader):** O serviço acessa a página da ANP, varre o HTML em busca do link `.xlsx` mais recente (dinamicamente).
+3.  **Cache Check (Redis):** Verifica se este arquivo já foi baixado e processado.
+    *   *Miss:* Baixa o arquivo, salva em disco e atualiza o cache com TTL calculado via NTP (até o próximo domingo).
+    *   *Hit:* Serve o arquivo local.
+4.  **Extractor (Pandas):** Lê o arquivo Excel, valida o schema (abas e colunas esperadas via configuração YAML), filtra por "DISTRITO FEDERAL" e "GASOLINA COMUM".
+5.  **Response:** Retorna o JSON com datas e preço médio.
+
+---
+
+## 🛠️ Tecnologias
+
+*   **Core:** Python 3.11+, FastAPI, Uvicorn.
+*   **Dados:** Pandas, OpenPyXL, NumPy.
+*   **Infra:** Docker, Docker Compose, Redis.
+*   **Qualidade:** Pytest (Testes), Ruff (Linting), Pre-Commit.
+*   **Utils:** HTTPX, Requests, Tenacity, Structlog, Prometheus Client, NTPlib.
+
+---
+
+## 📦 Instalação e Execução
+
+### Pré-requisitos
+*   Docker & Docker Compose (Recomendado)
+*   Ou Python 3.11+ instalado localmente
+
+### Opção 1: Via Docker (Produção/Simples)
+
+Esta é a maneira mais rápida de rodar a aplicação completa (API + Redis).
+
+```bash
+# Clone o repositório
+git clone https://github.com/DanAureliano/precogas.git
+cd precogas
+
+# Suba os containers
+docker-compose up --build -d
+
+# Acompanhe os logs
+docker-compose logs -f app
 ```
-precogas/
-├── app/
-│   ├── main.py                 # Ponto de entrada da aplicação (Definição da API)
-│   ├── services/
-│   │   ├── downloader.py       # Lógica de download, retry, SSL fallback e cache
-│   │   └── extractor.py        # Processamento da planilha Excel (Pandas)
-│   └── __init__.py
-├── dados_anp/                  # Armazenamento temporário das planilhas
-├── tests/                      # Testes automatizados
-├── docker-compose.yml          # Orquestração (API + Redis)
-├── requirements.txt            # Dependências
-├── README.md                   # Documentação
-└── TODO.md                     # Roadmap
-```
 
-## Endpoints
+A API estará disponível em: `http://localhost:8000`
 
-### `/precos` [GET]
+### Opção 2: Desenvolvimento Local
 
-Retorna as informações mais recentes do preço médio de gasolina comum no Distrito Federal.
-
-#### Exemplo de Resposta
-
-```json
-{
-  "dataInicial": "2025-01-19",
-  "dataFinal": "2025-01-25",
-  "precoMedioRevenda": 5.659
-}
-```
-
-## Como Executar
-
-### Via Docker (Recomendado)
-
-A forma mais simples, pois gerencia a API e o Redis automaticamente.
-
-1.  **Certifique-se de ter Docker e Docker Compose instalados.**
-2.  **Na raiz do projeto, execute:**
-    ```bash
-    docker-compose up --build
-    ```
-
-A API estará disponível em: `http://localhost:8000/precos`
-
-### Execução Local
-
-1.  **Crie e ative um ambiente virtual:**
+1.  **Crie e ative o ambiente virtual:**
     ```bash
     python -m venv venv
-    # Windows:
+    # Windows
     .\venv\Scripts\activate
-    # Linux/Mac:
+    # Linux/Mac
     source venv/bin/activate
     ```
+
 2.  **Instale as dependências:**
     ```bash
     pip install -r requirements.txt
     ```
-3.  **Configure o Redis:**
-    O projeto espera um Redis rodando em `localhost:6379` (padrão).
-    *Se o Redis não estiver disponível, o sistema funcionará, mas sem cache, baixando o arquivo a cada requisição.*
-4.  **Execute a aplicação:**
+
+3.  **Suba o Redis (Opcional, mas recomendado):**
+    ```bash
+    docker run -d -p 6379:6379 redis
+    ```
+    *Nota: Se não houver Redis, a aplicação funcionará, mas sem cache.*
+
+4.  **Configure o ambiente (.env):**
+    Copie o exemplo (se houver) ou defina as variáveis. O padrão já funciona localmente.
+
+5.  **Execute a API:**
     ```bash
     uvicorn app.main:app --reload
     ```
 
-## Configuração
+---
 
-A aplicação utiliza **variáveis de ambiente** para configuração (padrão [12-Factor App](https://12factor.net/)).
+## 📚 Documentação da API
 
-Você pode definir essas variáveis no seu sistema operacional ou criar um arquivo `.env` na raiz do projeto.
+Com a aplicação rodando, acesse a documentação interativa:
 
-| Variável | Descrição | Padrão |
-| :--- | :--- | :--- |
-| `REDIS_URL` | URL de conexão com o Redis | `redis://localhost:6379` |
-| `ANP_BASE_URL` | URL base para download da ANP | *(URL oficial da ANP)* |
+*   **Swagger UI:** [http://localhost:8000/docs](http://localhost:8000/docs)
+*   **ReDoc:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
 
-## Testes
+### Principais Endpoints
 
-O projeto utiliza `pytest` para testes unitários e de integração.
+*   `GET /precos`: Retorna o preço atual da gasolina no DF.
+*   `GET /health`: Status de saúde (Redis, Internet).
+*   `GET /metrics`: Métricas para Prometheus.
 
-Para executar os testes:
+---
 
+## 🧪 Testes e Qualidade
+
+O projeto segue rigorosos padrões de qualidade.
+
+**Executar Testes Unitários:**
 ```bash
 pytest
 ```
 
-Isso irá executar:
-- Testes da lógica de datas e URLs (mockando o tempo).
-- Testes de download (mockando requisições HTTP e sistema de arquivos).
-- Testes do endpoint `/precos` (simulando chamadas à API).
-
-## Configuração de Desenvolvimento
-
-Para garantir a qualidade do código localmente antes de enviar para o repositório, utilizamos **pre-commit hooks**.
-
-### Instalação
-
-1.  Instale as dependências de desenvolvimento:
-    ```bash
-    pip install -r requirements.txt
-    ```
-2.  Instale os hooks do git:
-    ```bash
-    pre-commit install
-    ```
-
-Agora, toda vez que você executar `git commit`, as verificações (Ruff, Pytest, etc.) rodarão automaticamente.
-
-## CI/CD
-
-Este projeto utiliza **GitHub Actions** para automação de CI. O workflow (`.github/workflows/ci.yml`) é acionado em todo *push* e *pull request* para a branch `main` e executa:
-
-1.  **Linting:** Verificação de estilo e erros estáticos com **Ruff**.
-2.  **Testes:** Execução de testes unitários e de integração com **Pytest**.
-3.  **Cobertura:** Verificação se a cobertura de código é de pelo menos **80%**.
-
-### Deploy Contínuo
-
-O deploy é gerenciado pelo **Render.com** via Blueprint (`render.yaml`).
-*   O Render monitora a branch `main`.
-*   Após um push bem-sucedido (e idealmente após a aprovação do CI), o Render constrói o container Docker e atualiza o serviço.
-
-## Convenções de Commit
-
-Este projeto adota estritamente o padrão **Conventional Commits**. Todo commit deve seguir a estrutura:
-
-```
-<tipo>(<escopo opcional>): <descrição curta>
-
-[corpo opcional]
-
-[rodapé opcional - ex: BREAKING CHANGE, Closes #123]
+**Verificar Cobertura:**
+```bash
+pytest --cov=app tests/
 ```
 
-### Tipos Permitidos:
-*   `feat`: Nova funcionalidade.
-*   `fix`: Correção de bug.
-*   `docs`: Alterações apenas em documentação.
-*   `style`: Formatação, ponto e vírgula faltando, etc. (não altera lógica).
-*   `refactor`: Refatoração de código (sem nova funcionalidade ou correção de bug).
-*   `test`: Adição ou correção de testes.
-*   `chore`: Atualização de tarefas de build, configs de pacote, etc.
+**Rodar Linter (Ruff):**
+```bash
+ruff check .
+```
 
-## Licença
+---
 
-Este projeto está licenciado sob a licença MIT. Consulte o arquivo [LICENSE.md](LICENSE.md) para mais detalhes.
+## 🤝 Contribuição
+
+Contribuições são bem-vindas! Por favor, leia o [CONTRIBUTING.md](CONTRIBUTING.md) para detalhes sobre o nosso código de conduta e o processo de envio de pull requests.
+
+1.  Faça um Fork do projeto.
+2.  Crie sua Feature Branch (`git checkout -b feat/nova-feature`).
+3.  Commit suas mudanças seguindo **Conventional Commits** (`git commit -m 'feat: adiciona nova feature'`).
+4.  Push para a Branch (`git push origin feat/nova-feature`).
+5.  Abra um Pull Request.
+
+---
+
+## 📄 Licença
+
+Este projeto está licenciado sob a Licença MIT - veja o arquivo [LICENSE.md](LICENSE.md) para detalhes.

@@ -21,6 +21,19 @@ except Exception as e:
     logger.error(f"Erro crítico ao carregar configuração ETL: {e}")
 
 def extrair_dados(caminho_arquivo: str | Path):
+    """
+    Processa o arquivo Excel da ANP para extrair o preço médio da gasolina no Distrito Federal.
+
+    Utiliza as configurações definidas em `etl_rules.yaml` para validar o schema da planilha
+    (abas, colunas, linha de cabeçalho) e aplicar filtros.
+
+    Args:
+        caminho_arquivo (str | Path): Caminho local para o arquivo .xlsx baixado.
+
+    Returns:
+        dict | None: Dicionário contendo 'dataInicial', 'dataFinal' e 'precoMedioRevenda'
+                     se a extração for bem-sucedida; caso contrário, retorna None.
+    """
     if not ETL_CONFIG:
         logger.error("Configuração ETL inválida ou não carregada.")
         return None

@@ -7,8 +7,16 @@ logger = setup_logger(__name__)
 
 def get_current_time(server: str = "pool.ntp.org") -> datetime:
     """
-    Obtém a hora atual de um servidor NTP.
-    Em caso de falha, retorna a hora local do sistema com log de aviso.
+    Obtém a hora atual precisa a partir de um servidor NTP.
+
+    Tenta conectar ao servidor NTP especificado para obter o timestamp.
+    Em caso de falha (timeout, erro de rede), realiza fallback para o relógio local do sistema.
+
+    Args:
+        server (str): Endereço do servidor NTP (padrão: "pool.ntp.org").
+
+    Returns:
+        datetime: Objeto datetime representando a hora atual (local naive).
     """
     try:
         client = ntplib.NTPClient()
