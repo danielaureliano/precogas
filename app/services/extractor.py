@@ -28,7 +28,7 @@ def extrair_dados(caminho_arquivo: str | Path):
     anp_conf = ETL_CONFIG.get("anp", {})
 
     try:
-        excel_data = pd.ExcelFile(caminho_arquivo)
+        excel_data = pd.ExcelFile(caminho_arquivo, engine="openpyxl")
         sheet = anp_conf.get("sheet_name", "ESTADOS")
 
         if sheet not in excel_data.sheet_names:
