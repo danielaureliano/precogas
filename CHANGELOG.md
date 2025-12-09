@@ -5,6 +5,21 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.10.1] - 2025-12-08
+
+### 🐛 Bug Fixes
+- **Tipo:** `fix`
+- **Escopo:** `(deploy)`
+- **Descrição:** Correção da variável de ambiente no `docker-compose.yml` de `REDIS_HOST` para `REDIS_URL`, garantindo a conexão correta da API com o container Redis via connection string.
+
+### 🔧 Chore
+- **Tipo:** `chore`
+- **Escopo:** `(config)`
+- **Descrição:** Atualização do `.gitignore` para ignorar logs, pastas temporárias e ambientes virtuais (`.venv`, `venv`).
+- **Tipo:** `chore`
+- **Escopo:** `(logging)`
+- **Descrição:** Limpeza de logs de depuração temporários no serviço de download e garantia do nível de log padrão `INFO`.
+
 ## [v1.10.0] - 2025-12-08
 
 ### ♻️ Refactor
