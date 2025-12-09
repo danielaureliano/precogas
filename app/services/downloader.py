@@ -27,7 +27,15 @@ OUTPUT_DIR = settings.OUTPUT_DIR
 SEARCH_URL = "https://www.gov.br/anp/pt-br/assuntos/precos-e-defesa-da-concorrencia/precos/levantamento-de-precos-de-combustiveis-ultimas-semanas-pesquisadas"
 
 def calcular_tempo_ate_proximo_domingo():
-    """Calcula quantos segundos faltam até o próximo domingo à meia-noite."""
+    """
+    Calcula o tempo restante (em segundos) até o próximo domingo à meia-noite.
+
+    Utiliza o serviço de sincronização de tempo (NTP) para obter a hora atual.
+    O valor calculado é utilizado como TTL (Time To Live) para o cache no Redis.
+
+    Returns:
+        int: Número de segundos até o próximo domingo às 00:00:00.
+    """
     hoje = get_current_time()
     proximo_domingo = hoje + timedelta(days=7 - hoje.weekday())
     proximo_domingo = proximo_domingo.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -50,7 +58,15 @@ def criar_sessao():
 
 def encontrar_url_mais_recente(session):
     """
-    Acessa a página da ANP e encontra a URL da planilha semanal mais recente.
+    Realiza o scraping da página da ANP para encontrar a URL da planilha mais recente.
+
+    Busca por links que terminam em '.xlsx' e contenham 'resumo_semanal' no href.
+
+    Args:
+        session (requests.Session): Sessão HTTP configurada para realizar a requisição.
+
+    Returns:
+        str | None: A URL completa do arquivo .xlsx se encontrado, ou None caso contrário.
     """
     logger.info(f"[Scraper] Buscando URL mais recente em: {SEARCH_URL}")
     try:
@@ -79,6 +95,22 @@ def encontrar_url_mais_recente(session):
         return None
 
 def baixar_arquivo():
+    """
+    Orquestra o processo de download da planilha da ANP.
+
+    1. Busca a URL mais recente via scraping.
+    2. Verifica se o arquivo já existe no cache (Redis) ou disco local.
+    3. Se não existir, realiza o download e salva no disco.
+    4. Atualiza o cache com TTL até o próximo domingo.
+
+    Returns:
+        tuple: Uma tupla contendo:
+            - url (str): URL do arquivo baixado.
+            - data_inicio (None): Placeholder mantido para compatibilidade, sempre None.
+            - data_fim (None): Placeholder mantido para compatibilidade, sempre None.
+            - caminho_arquivo (Path): Caminho local onde o arquivo foi salvo.
+            Retorna (None, None, None, None) em caso de falha.
+    """
     session = criar_sessao()
 
     # 1. Obter URL dinâmica via scraping
