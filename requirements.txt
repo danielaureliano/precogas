@@ -16,3 +16,4 @@ structlog==25.5.0
 prometheus-client==0.23.1
 pyyaml==6.0.3
 pydantic-settings==2.12.0
+ntplib==0.4.0
