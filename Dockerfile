@@ -1,5 +1,5 @@
 # Usar uma imagem base oficial do Python leve
-FROM python:3.10-slim
+FROM python:3.12-slim
 
 # Definir variáveis de ambiente
 # Impede o Python de escrever arquivos .pyc
@@ -20,8 +20,14 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copiar o restante do código do projeto
 COPY . .
 
-# Criar diretório para dados temporários se não existir (embora o volume/código possa tratar isso)
-RUN mkdir -p dados_anp
+# Criar um usuário não-root para segurança
+RUN adduser --disabled-password --gecos "" appuser
+
+# Criar diretório para dados temporários e ajustar permissões
+RUN mkdir -p dados_anp && chown -R appuser:appuser /app
+
+# Mudar para o usuário não-root
+USER appuser
 
 # Expor a porta que a aplicação usa
 EXPOSE 8000

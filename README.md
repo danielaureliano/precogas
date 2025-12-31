@@ -20,6 +20,10 @@ API RESTful de alta performance desenvolvida com **FastAPI** para monitoramento 
     *   Logs estruturados em JSON (`structlog`) com Trace ID distribuído.
     *   Métricas Prometheus nativas (`requests_total`, `response_time`).
     *   Health checks para dependências (Internet, Redis).
+*   **Segurança:**
+    *   **Infraestrutura:** Execução em Docker com usuário não-root (`appuser`) e limites de recursos.
+    *   **Proteção de Dados:** Mascaramento automático de credenciais em logs (`GH_TOKEN`, `password`).
+    *   **Trânsito:** Middleware de Headers de Segurança (HSTS, Anti-Clickjacking, No-Sniff).
 *   **Resiliência:** Políticas de *Retry* automáticos, Fallbacks de SSL e tratamento robusto de erros.
 
 ---
@@ -95,7 +99,15 @@ A API estará disponível em: `http://localhost:8000`
     *Nota: Se não houver Redis, a aplicação funcionará, mas sem cache.*
 
 4.  **Configure o ambiente (.env):**
-    Copie o exemplo (se houver) ou defina as variáveis. O padrão já funciona localmente.
+    Copie o exemplo (`cp .env.example .env`) e ajuste as variáveis.
+    
+    | Variável | Descrição | Padrão / Exemplo |
+    | :--- | :--- | :--- |
+    | `REDIS_URL` | URL de conexão com o Redis | `redis://localhost:6379` |
+    | `ANP_BASE_URL` | URL base do site da ANP (Opcional) | *URL oficial da ANP* |
+    | `GH_TOKEN` | Token do GitHub para automações (CI/CD) | `ghp_...` |
+    | `GEMINI_API_KEY` | Chave da API Gemini (Integrações futuras) | `AIza...` |
+    | `RENDER_DEPLOY_HOOK_URL` | Webhook para Deploy automático no Render | `https://api.render.com/...` |
 
 5.  **Execute a API:**
     ```bash

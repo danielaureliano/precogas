@@ -5,6 +5,39 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### 🛡️ Security
+- **Tipo:** `feat`
+- **Escopo:** `(logging)`
+- **Descrição:** Implementação de filtro de segurança (`mask_sensitive_data`) no `structlog`. Chaves sensíveis como `token`, `password` ou `key` são automaticamente substituídas por `***MASKED***` nos logs, prevenindo vazamentos acidentais de credenciais de CI/CD.
+- **Tipo:** `feat`
+- **Escopo:** `(http)`
+- **Descrição:** Adição de `SecurityHeadersMiddleware` para injetar headers de proteção: HSTS (Strict-Transport-Security), X-Frame-Options (Anti-Clickjacking) e X-Content-Type-Options.
+
+### 🏗️ Infrastructure
+- **Tipo:** `chore`
+- **Escopo:** `(docker)`
+- **Descrição:** Atualização da imagem base para `python:3.12-slim`. Implementação de usuário não-root (`appuser`) para execução segura. Adição de healthchecks, volumes persistentes e limites de recursos (CPU/RAM) no `docker-compose.yml`.
+
+### 📦 Dependencies
+- **Tipo:** `chore`
+- **Escopo:** `(deps)`
+- **Descrição:** Atualização de bibliotecas principais: `fastapi` (0.128.0), `uvicorn` (0.40.0), `ruff` (0.14.10) e `pre-commit` (4.5.1).
+
+### ⚙️ Configuration
+- **Tipo:** `feat`
+- **Escopo:** `(env)`
+- **Descrição:** Adição de suporte a novas variáveis de ambiente para CI/CD e integrações: `GH_TOKEN`, `GEMINI_API_KEY`, `RENDER_DEPLOY_HOOK_URL`. Configuração do Pydantic para ignorar variáveis extras do sistema.
+- **Tipo:** `chore`
+- **Escopo:** `(vscode)`
+- **Descrição:** Otimização do arquivo `precogas.code-workspace` para desenvolvimento em Windows com suporte nativo a Pytest e Ruff.
+
+### 🚀 CI/CD
+- **Tipo:** `ci`
+- **Escopo:** `(github-actions)`
+- **Descrição:** Integração de pipeline de CD para deploy automático no Render após sucesso dos testes na branch `main`.
+
 ## [v1.11.1] - 2025-12-09
 
 ### 🐛 Bug Fixes

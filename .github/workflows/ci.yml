@@ -47,3 +47,22 @@ jobs:
         REDIS_URL: redis://localhost:6379
       run: |
         pytest --cov=app --cov-fail-under=80
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    steps:
+      - name: Deploy to Render
+        env:
+          DEPLOY_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -n "$DEPLOY_URL" ]; then
+            echo "🚀 Triggering Render Deploy..."
+            curl -X POST "$DEPLOY_URL"
+          else
+            echo "⚠️ RENDER_DEPLOY_HOOK_URL not set in secrets. Skipping deploy."
+            exit 1
+          fi
+

@@ -2,12 +2,13 @@ import time
 import uuid
 import structlog.contextvars
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, status, Request
+from fastapi import FastAPI, status, Request, Depends
 from fastapi.responses import JSONResponse, PlainTextResponse, RedirectResponse
 from app.services.downloader import baixar_arquivo, redis_client
 from app.services.extractor import extrair_dados
 from app.services.logger import setup_logger
 from app.core.config import settings
+from app.core.security import SecurityHeadersMiddleware # Importação de segurança
 import requests
 import redis
 from prometheus_client import Counter, Histogram, generate_latest
@@ -57,6 +58,9 @@ async def lifespan(app: FastAPI):
     logger.info("Encerrando aplicação...", status="shutdown")
 
 app = FastAPI(lifespan=lifespan)
+
+# Adiciona Middleware de Headers de Segurança
+app.add_middleware(SecurityHeadersMiddleware)
 
 # Métricas Prometheus
 REQUESTS_TOTAL = Counter("http_requests_total", "Total HTTP Requests", ["method", "endpoint", "status_code"])

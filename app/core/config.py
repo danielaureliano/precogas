@@ -12,6 +12,18 @@ class Settings(BaseSettings):
     # ETL Config
     ETL_CONFIG_PATH: Path = Path("config/etl_rules.yaml")
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    # Credenciais e Integrações
+    GH_TOKEN: str | None = None
+    GEMINI_API_KEY: str | None = None
+    RENDER_DEPLOY_HOOK_URL: str | None = None
+    
+    # Segurança da Aplicação
+    REDIS_PASSWORD: str | None = None
+
+    model_config = SettingsConfigDict(
+        env_file=".env", 
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
 
 settings = Settings()
