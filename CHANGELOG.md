@@ -5,9 +5,15 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [v1.12.0] - 2025-12-31
 
 ### 🛡️ Security
+- **Tipo:** `feat`
+- **Escopo:** `(rate-limit)`
+- **Descrição:** Implementação de Rate Limiting com `slowapi` e Redis. Limites: 10 req/min (/precos) e 60 req/min (/health). Retorna HTTP 429 em caso de abuso.
+- **Tipo:** `fix`
+- **Escopo:** `(deps)`
+- **Descrição:** Atualização crítica do `filelock` para v3.20.1 (CVE-2025-68146).
 - **Tipo:** `feat`
 - **Escopo:** `(logging)`
 - **Descrição:** Implementação de filtro de segurança (`mask_sensitive_data`) no `structlog`. Chaves sensíveis como `token`, `password` ou `key` são automaticamente substituídas por `***MASKED***` nos logs, prevenindo vazamentos acidentais de credenciais de CI/CD.
@@ -73,3 +79,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [v1.10.1] - 2025-12-08
 ... (versões anteriores mantidas)
+
+[v1.12.0]: https://github.com/danielaureliano/precogas/compare/v1.11.1...v1.12.0
+[v1.11.1]: https://github.com/danielaureliano/precogas/compare/v1.11.0...v1.11.1
+[v1.11.0]: https://github.com/danielaureliano/precogas/compare/v1.10.1...v1.11.0
+[v1.10.1]: https://github.com/danielaureliano/precogas/releases/tag/v1.10.1

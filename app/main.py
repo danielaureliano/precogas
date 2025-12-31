@@ -68,7 +68,12 @@ async def lifespan(app: FastAPI):
     # Shutdown logic
     logger.info("Encerrando aplicação...", status="shutdown")
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(
+    title="PrecoGas API",
+    version="1.12.0",
+    description="API de monitoramento do preço da gasolina no DF com dados da ANP.",
+    lifespan=lifespan
+)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
