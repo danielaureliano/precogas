@@ -2,18 +2,29 @@ import time
 import uuid
 import structlog.contextvars
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, status, Request, Depends
+from fastapi import FastAPI, status, Request
 from fastapi.responses import JSONResponse, PlainTextResponse, RedirectResponse
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 from app.services.downloader import baixar_arquivo, redis_client
 from app.services.extractor import extrair_dados
 from app.services.logger import setup_logger
 from app.core.config import settings
-from app.core.security import SecurityHeadersMiddleware # Importação de segurança
+from app.core.security import SecurityHeadersMiddleware
 import requests
 import redis
 from prometheus_client import Counter, Histogram, generate_latest
 
 logger = setup_logger(__name__)
+
+# Configuração Rate Limiting (Usando Redis se disponível)
+REDIS_LIMITER_URL = settings.REDIS_URL
+limiter = Limiter(
+    key_func=get_remote_address, 
+    default_limits=["20/minute"],
+    storage_uri=REDIS_LIMITER_URL
+)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -58,6 +69,8 @@ async def lifespan(app: FastAPI):
     logger.info("Encerrando aplicação...", status="shutdown")
 
 app = FastAPI(lifespan=lifespan)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # Adiciona Middleware de Headers de Segurança
 app.add_middleware(SecurityHeadersMiddleware)
@@ -109,9 +122,11 @@ async def root():
     return RedirectResponse(url="/redoc")
 
 @app.get("/precos")
-async def obter_precos():
+@limiter.limit("10/minute")
+async def obter_precos(request: Request):
     """
     Endpoint principal para consulta de preços.
+    Rate Limit: 10 requisições/minuto.
 
     Processo:
     1. Aciona o `baixar_arquivo` para obter a planilha mais recente (com cache).
@@ -137,9 +152,11 @@ async def obter_precos():
     return resultado
 
 @app.get("/health")
-async def health_check():
+@limiter.limit("60/minute")
+async def health_check(request: Request):
     """
     Endpoint para verificação de saúde da aplicação.
+    Rate Limit: 60 requisições/minuto.
     Verifica a conectividade com a internet e com o Redis.
     """
     logger.info("Processando requisição para /health")
