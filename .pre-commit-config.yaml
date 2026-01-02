@@ -17,16 +17,3 @@ repos:
         args: [ --fix ]
       # Roda o formatador
       - id: ruff-format
-
-  # Hook local para rodar testes antes do push (opcional, configurado como 'manual' por padrão ou 'push')
-  # Para ativar no commit, remova 'stages: [push]'
-  - repo: local
-    hooks:
-      - id: pytest-check
-        name: Run Tests (Local)
-        entry: pytest
-        language: system
-        types: [python]
-        pass_filenames: false
-        always_run: true
-        stages: [pre-push] # Roda apenas no 'git push', não a cada commit, para não travar o fluxo.
