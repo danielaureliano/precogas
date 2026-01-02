@@ -22,8 +22,9 @@ API RESTful de alta performance desenvolvida com **FastAPI** para monitoramento 
     *   Health checks para dependências (Internet, Redis).
 *   **Segurança:**
     *   **Infraestrutura:** Execução em Docker com usuário não-root (`appuser`) e limites de recursos.
-    *   **Proteção de Dados:** Mascaramento automático de credenciais em logs (`GH_TOKEN`, `password`).
+    *   **Proteção de Dados:** Mascaramento automático de credenciais em logs.
     *   **Trânsito:** Middleware de Headers de Segurança (HSTS, Anti-Clickjacking, No-Sniff).
+    *   **Rate Limiting:** Proteção contra abuso (SlowAPI) baseada em IP.
 *   **Resiliência:** Políticas de *Retry* automáticos, Fallbacks de SSL e tratamento robusto de erros.
 
 ---
@@ -33,12 +34,13 @@ API RESTful de alta performance desenvolvida com **FastAPI** para monitoramento 
 O sistema opera em um fluxo contínuo de ETL On-Demand:
 
 1.  **Requisição:** O cliente chama `GET /precos`.
-2.  **Scraper (Downloader):** O serviço acessa a página da ANP, varre o HTML em busca do link `.xlsx` mais recente (dinamicamente).
-3.  **Cache Check (Redis):** Verifica se este arquivo já foi baixado e processado.
-    *   *Miss:* Baixa o arquivo, salva em disco e atualiza o cache com TTL calculado via NTP (até o próximo domingo).
+2.  **Rate Check:** Verifica se o IP excedeu o limite de requisições.
+3.  **Scraper (Downloader):** O serviço acessa a página da ANP, varre o HTML em busca do link `.xlsx` mais recente.
+4.  **Cache Check (Redis):** Verifica se este arquivo já foi baixado e processado.
+    *   *Miss:* Baixa o arquivo, salva em disco e atualiza o cache.
     *   *Hit:* Serve o arquivo local.
-4.  **Extractor (Pandas):** Lê o arquivo Excel, valida o schema (abas e colunas esperadas via configuração YAML), filtra por "DISTRITO FEDERAL" e "GASOLINA COMUM".
-5.  **Response:** Retorna o JSON com datas e preço médio.
+5.  **Extractor (Pandas):** Lê o arquivo Excel, valida o schema e filtra os dados.
+6.  **Response:** Retorna o JSON validado pelo schema Pydantic.
 
 ---
 
@@ -104,6 +106,7 @@ A API estará disponível em: `http://localhost:8000`
     | Variável | Descrição | Padrão / Exemplo |
     | :--- | :--- | :--- |
     | `REDIS_URL` | URL de conexão com o Redis | `redis://localhost:6379` |
+    | `REDIS_PASSWORD` | Senha segura para o Redis | *obrigatório* |
     | `ANP_BASE_URL` | URL base do site da ANP (Opcional) | *URL oficial da ANP* |
     | `GH_TOKEN` | Token do GitHub para automações (CI/CD) | `ghp_...` |
     | `GEMINI_API_KEY` | Chave da API Gemini (Integrações futuras) | `AIza...` |

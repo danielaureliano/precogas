@@ -12,6 +12,7 @@ from app.services.extractor import extrair_dados
 from app.services.logger import setup_logger
 from app.core.config import settings
 from app.core.security import SecurityHeadersMiddleware
+from app.schemas import PrecoGasolinaResponse, HealthCheckResponse, ErrorResponse
 import requests
 import redis
 from prometheus_client import Counter, Histogram, generate_latest
@@ -70,7 +71,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="PrecoGas API",
-    version="1.12.0",
+    version="1.12.1",
     description="API de monitoramento do preço da gasolina no DF com dados da ANP.",
     lifespan=lifespan
 )
@@ -126,19 +127,19 @@ async def root():
     """
     return RedirectResponse(url="/redoc")
 
-@app.get("/precos")
+@app.get("/precos", response_model=PrecoGasolinaResponse, responses={503: {"model": ErrorResponse}})
 @limiter.limit("10/minute")
 async def obter_precos(request: Request):
     """
-    Endpoint principal para consulta de preços.
-    Rate Limit: 10 requisições/minuto.
+    Obtém o preço médio de revenda da gasolina no Distrito Federal.
 
-    Processo:
-    1. Aciona o `baixar_arquivo` para obter a planilha mais recente (com cache).
-    2. Aciona o `extrair_dados` para ler e filtrar as informações do DF.
+    Este endpoint realiza o download da planilha mais recente da ANP, processa o arquivo
+    e retorna os dados referentes ao Distrito Federal.
+
+    **Rate Limit:** 10 requisições por minuto.
 
     Returns:
-        JSONResponse: Dados formatados ou erro 503 se indisponível.
+        JSONResponse: Dados formatados com data inicial, final e preço médio.
     """
     logger.info("Processando requisição para /precos")
     # Baixa o arquivo mais recente
@@ -156,13 +157,17 @@ async def obter_precos(request: Request):
     logger.info("Dados extraídos com sucesso para o Distrito Federal.", status="data_extracted")
     return resultado
 
-@app.get("/health")
+@app.get("/health", response_model=HealthCheckResponse, responses={503: {"model": HealthCheckResponse}})
 @limiter.limit("60/minute")
 async def health_check(request: Request):
     """
-    Endpoint para verificação de saúde da aplicação.
-    Rate Limit: 60 requisições/minuto.
-    Verifica a conectividade com a internet e com o Redis.
+    Verifica a saúde da aplicação e suas dependências.
+
+    Verifica a conectividade com:
+    1. Internet (via Google)
+    2. Redis (Cache e Rate Limiting)
+
+    **Rate Limit:** 60 requisições por minuto.
     """
     logger.info("Processando requisição para /health")
     status_checks = {}

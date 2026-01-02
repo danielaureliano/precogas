@@ -5,6 +5,27 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v1.12.1] - 2026-01-02
+
+### 🛡️ Security
+- **Tipo:** `fix`
+- **Escopo:** `(history)`
+- **Descrição:** Reescrita completa do histórico Git para remoção de artefatos sensíveis e configurações inseguras antigas.
+- **Tipo:** `fix`
+- **Escopo:** `(config)`
+- **Descrição:** Remoção de valores padrão inseguros (`:-`) no `docker-compose.yml`, forçando o uso de variáveis de ambiente seguras para o Redis.
+- **Tipo:** `chore`
+- **Escopo:** `(auth)`
+- **Descrição:** Remoção da complexidade de `API_ACCESS_TOKEN` para manter a API pública e simplificada, focando a segurança na infraestrutura.
+
+### 📝 Documentation
+- **Tipo:** `docs`
+- **Escopo:** `(openapi)`
+- **Descrição:** Implementação de Schemas Pydantic (`PrecoGasolinaResponse`, `HealthCheckResponse`) para gerar exemplos de resposta ricos e precisos no Redoc/Swagger.
+- **Tipo:** `docs`
+- **Escopo:** `(readme)`
+- **Descrição:** Atualização das instruções de segurança e remoção de referências obsoletas a tokens de API.
+
 ## [v1.12.0] - 2025-12-31
 
 ### 🛡️ Security
@@ -80,6 +101,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [v1.10.1] - 2025-12-08
 ... (versões anteriores mantidas)
 
+[v1.12.1]: https://github.com/danielaureliano/precogas/compare/v1.12.0...v1.12.1
 [v1.12.0]: https://github.com/danielaureliano/precogas/compare/v1.11.1...v1.12.0
 [v1.11.1]: https://github.com/danielaureliano/precogas/compare/v1.11.0...v1.11.1
 [v1.11.0]: https://github.com/danielaureliano/precogas/compare/v1.10.1...v1.11.0
