@@ -5,6 +5,20 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [v1.12.2] - 2026-01-02
+
+### 🐛 Bug Fixes
+- **Tipo:** `fix`
+- **Escopo:** `(api)`
+- **Descrição:** Corrige `ResponseValidationError` ao garantir que a camada de extração de dados (`extractor`) retorne datas como `string` formatada (`dd/mm/aaaa`), em vez de objetos `Timestamp`, alinhando a saída ao schema Pydantic.
+
+### 🧪 Tests
+- **Tipo:** `test`
+- **Escopo:** `(extractor)`
+- **Descrição:** Adiciona teste unitário para validar que o tipo e o formato das datas retornadas pelo `extractor` são `string` no padrão `dd/mm/aaaa`.
+
 ## [v1.12.1] - 2026-01-02
 
 ### 🛡️ Security
@@ -101,6 +115,7 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ## [v1.10.1] - 2025-12-08
 ... (versões anteriores mantidas)
 
+[v1.12.2]: https://github.com/danielaureliano/precogas/compare/v1.12.1...v1.12.2
 [v1.12.1]: https://github.com/danielaureliano/precogas/compare/v1.12.0...v1.12.1
 [v1.12.0]: https://github.com/danielaureliano/precogas/compare/v1.11.1...v1.12.0
 [v1.11.1]: https://github.com/danielaureliano/precogas/compare/v1.11.0...v1.11.1

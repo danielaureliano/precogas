@@ -107,3 +107,19 @@ Todo código gerado, refatorado ou revisado deve seguir estritamente estas regra
 
 ### 5. Estilo de Interação do Agente
 *   **Abordagem "Code-First":** O agente deve priorizar a entrega de código funcional antes de explicações teóricas.
+
+## 🎓 Aprendizados Recentes (Live-Doc)
+
+Esta seção documenta lições aprendidas durante o desenvolvimento e manutenção, servindo como um guia rápido para evitar problemas futuros.
+
+*   **Validação de Resposta (Pydantic):** A introdução de `response_model` no FastAPI ativa uma camada de validação de saída. Um erro de produção (`ResponseValidationError`) ocorreu porque a camada de extração (`extractor`) retornava objetos `pandas.Timestamp`, enquanto o schema da API esperava `string` formatada.
+    *   **Lição:** A camada de serviço/lógica de negócio deve sempre retornar dados no formato exato que o contrato da API (schema) define. Testes unitários devem validar não apenas o valor, mas também o **tipo** do dado retornado.
+
+*   **Ambientes de Teste vs. Produção:** Testes locais falharam ao tentar conectar no Redis de produção (`red-d4jljfh5pdvs739i9in0`) porque o arquivo `.env` continha configurações do ambiente do Render.
+    *   **Lição:** O `.env` nunca deve ser comitado. Use `.env.example` para documentar as variáveis necessárias. Ambientes locais (desenvolvimento, testes) devem ter seus próprios arquivos `.env` ou usar variáveis de ambiente que apontem para serviços locais (ex: `redis://localhost:6379`) ou mocks. O CI deve injetar suas próprias variáveis.
+
+*   **CI/CD e Qualidade de Código (Linting):** Um push falhou no GitHub Actions devido a um erro de linting (`F401: unused import`) que não foi pego localmente.
+    *   **Lição:** Implementar hooks de `pre-commit` com `ruff` e `pytest` é crucial para garantir que apenas código validado chegue ao repositório. Isso reduz o ciclo de feedback e evita falhas no pipeline principal. Hooks de `pre-push` são ideais para testes mais longos.
+
+*   **Limpeza de Histórico (Git Scrubbing):** Após um alerta de segurança (GitGuardian), foi necessário reescrever o histórico do Git para remover qualquer vestígio de credenciais. A ferramenta `git filter-branch` foi usada.
+    *   **Lição:** A reescrita do histórico (`force-push`) é uma operação destrutiva e deve ser comunicada a toda a equipe. É o último recurso. A prevenção (via `.gitignore` e `pre-commit` hooks que barram segredos) é sempre a melhor estratégia.

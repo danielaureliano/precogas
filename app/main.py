@@ -22,10 +22,11 @@ logger = setup_logger(__name__)
 # Configuração Rate Limiting (Usando Redis se disponível)
 REDIS_LIMITER_URL = settings.REDIS_URL
 limiter = Limiter(
-    key_func=get_remote_address, 
+    key_func=get_remote_address,
     default_limits=["20/minute"],
-    storage_uri=REDIS_LIMITER_URL
+    storage_uri=REDIS_LIMITER_URL,
 )
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -46,34 +47,57 @@ async def lifespan(app: FastAPI):
 
     # Verificar diretório de dados
     if not settings.OUTPUT_DIR.exists():
-        logger.info(f"Diretório {settings.OUTPUT_DIR} não existe. Tentando criar...", status="dir_creation")
+        logger.info(
+            f"Diretório {settings.OUTPUT_DIR} não existe. Tentando criar...",
+            status="dir_creation",
+        )
         try:
             settings.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-            logger.info(f"Diretório {settings.OUTPUT_DIR} criado com sucesso.", status="dir_created")
+            logger.info(
+                f"Diretório {settings.OUTPUT_DIR} criado com sucesso.",
+                status="dir_created",
+            )
         except Exception as e:
-            logger.error(f"Falha crítica ao criar diretório {settings.OUTPUT_DIR}: {e}", status="dir_creation_failed")
-            raise RuntimeError(f"Falha no startup: Não foi possível criar diretório de dados: {e}")
+            logger.error(
+                f"Falha crítica ao criar diretório {settings.OUTPUT_DIR}: {e}",
+                status="dir_creation_failed",
+            )
+            raise RuntimeError(
+                f"Falha no startup: Não foi possível criar diretório de dados: {e}"
+            )
 
     # Verificar permissão de escrita
     try:
         test_file = settings.OUTPUT_DIR / ".write_test"
         test_file.touch()
         test_file.unlink()
-        logger.info(f"Permissões de escrita em {settings.OUTPUT_DIR} verificadas: OK", status="write_permission_ok")
+        logger.info(
+            f"Permissões de escrita em {settings.OUTPUT_DIR} verificadas: OK",
+            status="write_permission_ok",
+        )
     except Exception as e:
-        logger.error(f"Sem permissão de escrita em {settings.OUTPUT_DIR}: {e}", status="write_permission_failed")
-        raise RuntimeError(f"Falha no startup: Sem permissão de escrita em {settings.OUTPUT_DIR}")
+        logger.error(
+            f"Sem permissão de escrita em {settings.OUTPUT_DIR}: {e}",
+            status="write_permission_failed",
+        )
+        raise RuntimeError(
+            f"Falha no startup: Sem permissão de escrita em {settings.OUTPUT_DIR}"
+        )
 
-    logger.info("Verificações de startup concluídas com sucesso.", status="startup_check_success")
+    logger.info(
+        "Verificações de startup concluídas com sucesso.",
+        status="startup_check_success",
+    )
     yield
     # Shutdown logic
     logger.info("Encerrando aplicação...", status="shutdown")
 
+
 app = FastAPI(
     title="PrecoGas API",
-    version="1.12.1",
+    version="1.12.2",
     description="API de monitoramento do preço da gasolina no DF com dados da ANP.",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -82,8 +106,13 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 app.add_middleware(SecurityHeadersMiddleware)
 
 # Métricas Prometheus
-REQUESTS_TOTAL = Counter("http_requests_total", "Total HTTP Requests", ["method", "endpoint", "status_code"])
-RESPONSE_TIME_SECONDS = Histogram("http_response_time_seconds", "HTTP Response Time", ["method", "endpoint"])
+REQUESTS_TOTAL = Counter(
+    "http_requests_total", "Total HTTP Requests", ["method", "endpoint", "status_code"]
+)
+RESPONSE_TIME_SECONDS = Histogram(
+    "http_response_time_seconds", "HTTP Response Time", ["method", "endpoint"]
+)
+
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
@@ -107,18 +136,37 @@ async def add_process_time_header(request: Request, call_next):
     # Gerar e vincular um trace_id para a requisição
     trace_id = str(uuid.uuid4())
     structlog.contextvars.bind_contextvars(trace_id=trace_id)
-    logger.info("Iniciando requisição", method=request.method, endpoint=request.url.path, trace_id=trace_id)
+    logger.info(
+        "Iniciando requisição",
+        method=request.method,
+        endpoint=request.url.path,
+        trace_id=trace_id,
+    )
 
     response = await call_next(request)
     process_time = time.time() - start_time
 
     # Registrar métricas
-    REQUESTS_TOTAL.labels(method=request.method, endpoint=request.url.path, status_code=response.status_code).inc()
-    RESPONSE_TIME_SECONDS.labels(method=request.method, endpoint=request.url.path).observe(process_time)
+    REQUESTS_TOTAL.labels(
+        method=request.method,
+        endpoint=request.url.path,
+        status_code=response.status_code,
+    ).inc()
+    RESPONSE_TIME_SECONDS.labels(
+        method=request.method, endpoint=request.url.path
+    ).observe(process_time)
 
-    logger.info("Finalizando requisição", method=request.method, endpoint=request.url.path, status_code=response.status_code, response_time_sec=process_time, trace_id=trace_id)
+    logger.info(
+        "Finalizando requisição",
+        method=request.method,
+        endpoint=request.url.path,
+        status_code=response.status_code,
+        response_time_sec=process_time,
+        trace_id=trace_id,
+    )
 
     return response
+
 
 @app.get("/", include_in_schema=False)
 async def root():
@@ -127,7 +175,12 @@ async def root():
     """
     return RedirectResponse(url="/redoc")
 
-@app.get("/precos", response_model=PrecoGasolinaResponse, responses={503: {"model": ErrorResponse}})
+
+@app.get(
+    "/precos",
+    response_model=PrecoGasolinaResponse,
+    responses={503: {"model": ErrorResponse}},
+)
 @limiter.limit("10/minute")
 async def obter_precos(request: Request):
     """
@@ -145,19 +198,40 @@ async def obter_precos(request: Request):
     # Baixa o arquivo mais recente
     url, data_inicio, data_fim, caminho_arquivo = baixar_arquivo()
     if not caminho_arquivo:
-        logger.error("Arquivo da ANP não encontrado após tentativas de download.", status="download_failed")
-        return JSONResponse(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, content={"erro": "Arquivo não encontrado no site da ANP"})
+        logger.error(
+            "Arquivo da ANP não encontrado após tentativas de download.",
+            status="download_failed",
+        )
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={"erro": "Arquivo não encontrado no site da ANP"},
+        )
 
     # Extrai os dados da planilha
     resultado = extrair_dados(caminho_arquivo)
     if not resultado:
-        logger.error("Não foi possível extrair os dados para o Distrito Federal do arquivo baixado.", status="extraction_failed")
-        return JSONResponse(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, content={"erro": "Não foi possível extrair os dados para o Distrito Federal"})
+        logger.error(
+            "Não foi possível extrair os dados para o Distrito Federal do arquivo baixado.",
+            status="extraction_failed",
+        )
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={
+                "erro": "Não foi possível extrair os dados para o Distrito Federal"
+            },
+        )
 
-    logger.info("Dados extraídos com sucesso para o Distrito Federal.", status="data_extracted")
+    logger.info(
+        "Dados extraídos com sucesso para o Distrito Federal.", status="data_extracted"
+    )
     return resultado
 
-@app.get("/health", response_model=HealthCheckResponse, responses={503: {"model": HealthCheckResponse}})
+
+@app.get(
+    "/health",
+    response_model=HealthCheckResponse,
+    responses={503: {"model": HealthCheckResponse}},
+)
 @limiter.limit("60/minute")
 async def health_check(request: Request):
     """
@@ -181,7 +255,10 @@ async def health_check(request: Request):
     except requests.exceptions.RequestException as e:
         status_checks["internet_connection"] = f"FAIL: {e}"
         overall_status = status.HTTP_503_SERVICE_UNAVAILABLE
-        logger.error(f"Verificação de conectividade com a internet: FALHA - {e}", check="internet")
+        logger.error(
+            f"Verificação de conectividade com a internet: FALHA - {e}",
+            check="internet",
+        )
 
     # 2. Verificar conexão com Redis
     if redis_client:
@@ -192,16 +269,30 @@ async def health_check(request: Request):
         except redis.exceptions.ConnectionError as e:
             status_checks["redis_connection"] = f"FAIL: {e}"
             overall_status = status.HTTP_503_SERVICE_UNAVAILABLE
-            logger.error(f"Verificação de conexão com Redis: FALHA - {e}", check="redis")
+            logger.error(
+                f"Verificação de conexão com Redis: FALHA - {e}", check="redis"
+            )
     else:
-        status_checks["redis_connection"] = "WARNING: Redis client not initialized (connection failed at startup)"
-        logger.warning("Verificação de conexão com Redis: Cliente Redis não inicializado.", check="redis")
+        status_checks["redis_connection"] = (
+            "WARNING: Redis client not initialized (connection failed at startup)"
+        )
+        logger.warning(
+            "Verificação de conexão com Redis: Cliente Redis não inicializado.",
+            check="redis",
+        )
 
     # 3. Status do serviço principal (a API está de pé)
     status_checks["api_service"] = "OK"
     logger.info("Verificação do serviço da API: OK", check="api_service")
 
-    return JSONResponse(status_code=overall_status, content={"status": "UP" if overall_status == status.HTTP_200_OK else "DOWN", "checks": status_checks})
+    return JSONResponse(
+        status_code=overall_status,
+        content={
+            "status": "UP" if overall_status == status.HTTP_200_OK else "DOWN",
+            "checks": status_checks,
+        },
+    )
+
 
 @app.get("/metrics", response_class=PlainTextResponse)
 async def metrics():
