@@ -44,15 +44,7 @@ O sistema opera em um fluxo contínuo de ETL On-Demand:
 
 ---
 
-## 🛠️ Tecnologias
 
-*   **Core:** Python 3.11+, FastAPI, Uvicorn.
-*   **Dados:** Pandas, OpenPyXL, NumPy.
-*   **Infra:** Docker, Docker Compose, Redis.
-*   **Qualidade:** Pytest (Testes), Ruff (Linting), Pre-Commit.
-*   **Utils:** HTTPX, Requests, Tenacity, Structlog, Prometheus Client, NTPlib.
-
----
 
 ## 📦 Instalação e Execução
 
@@ -102,7 +94,7 @@ A API estará disponível em: `http://localhost:8000`
 
 4.  **Configure o ambiente (.env):**
     Copie o exemplo (`cp .env.example .env`) e ajuste as variáveis.
-    
+
     | Variável | Descrição | Padrão / Exemplo |
     | :--- | :--- | :--- |
     | `REDIS_URL` | URL de conexão com o Redis | `redis://localhost:6379` |

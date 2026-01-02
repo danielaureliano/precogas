@@ -1,24 +1,32 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
       - id: check-added-large-files
+      - id: check-merge-conflict
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.3.0
+    # Sync com a versão usada no projeto (aproximada)
+    rev: v0.4.8
     hooks:
+      # Roda o linter
       - id: ruff
-        args: [ --fix, --exit-non-zero-on-fix ]
+        args: [ --fix ]
+      # Roda o formatador
+      - id: ruff-format
 
+  # Hook local para rodar testes antes do push (opcional, configurado como 'manual' por padrão ou 'push')
+  # Para ativar no commit, remova 'stages: [push]'
   - repo: local
     hooks:
-      - id: check-deps
-        name: Check Dependencies
-        entry: python scripts/check_deps.py
+      - id: pytest-check
+        name: Run Tests (Local)
+        entry: pytest
         language: system
         types: [python]
         pass_filenames: false
         always_run: true
+        stages: [pre-push] # Roda apenas no 'git push', não a cada commit, para não travar o fluxo.
