@@ -192,7 +192,12 @@ async def obter_precos(request: Request):
     **Rate Limit:** 10 requisições por minuto.
 
     Returns:
-        JSONResponse: Dados formatados com data inicial, final e preço médio.
+        PrecoGasolinaResponse: Dados formatados contendo:
+        - `dataInicial`: UNIX Timestamp (ms) do início da semana (domingo).
+        - `dataFinal`: UNIX Timestamp (ms) do fim da semana (sábado).
+        - `precoMedioRevenda`: Valor monetário (float).
+
+        *Nota: As datas são calculadas considerando o início do dia no fuso horário de Brasília.*
     """
     logger.info("Processando requisição para /precos")
     # Baixa o arquivo mais recente

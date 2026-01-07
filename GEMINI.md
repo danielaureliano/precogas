@@ -123,3 +123,6 @@ Esta seção documenta lições aprendidas durante o desenvolvimento e manutenç
 
 *   **Limpeza de Histórico (Git Scrubbing):** Após um alerta de segurança (GitGuardian), foi necessário reescrever o histórico do Git para remover qualquer vestígio de credenciais. A ferramenta `git filter-branch` foi usada.
     *   **Lição:** A reescrita do histórico (`force-push`) é uma operação destrutiva e deve ser comunicada a toda a equipe. É o último recurso. A prevenção (via `.gitignore` e `pre-commit` hooks que barram segredos) é sempre a melhor estratégia.
+
+*   **Sincronização de Workflow (Git Pull):** Conflitos de merge complexos ocorreram ao tentar integrar um hotfix em uma branch principal que havia avançado significativamente no repositório remoto.
+    *   **Lição:** **SEMPRE** execute `git pull origin <branch-principal>` antes de iniciar qualquer nova tarefa (hotfix, feature, chore). Trabalhar em uma base de código desatualizada aumenta exponencialmente o risco de conflitos e retrabalho. Garanta que seu ambiente local reflita a verdade do remoto (`origin/main`).
