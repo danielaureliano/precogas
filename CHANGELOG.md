@@ -7,13 +7,29 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
-## [v1.12.3] - 2026-01-07
+## [v1.13.0] - 2026-01-07
+
+### ✨ Features
+- **Tipo:** `feat`
+- **Escopo:** `(health)`
+- **Descrição:** Adição da versão da aplicação na resposta do endpoint `/health`, facilitando o monitoramento de deploys e a verificação da versão ativa em produção.
 
 ### 🐛 Bug Fixes
 - **Tipo:** `fix`
 - **Escopo:** `(api)`
-- **Descrição:** Ajuste no formato das datas da resposta do endpoint `/precos` para UNIX timestamp (milissegundos) com base no fuso horário `America/Sao_Paulo`. Esta alteração garante a exibição correta das datas (ex: 28/12 a 03/01) em aplicações frontend como Bubble.io.
-- **Descrição:** Adição de validação de integridade de datas (data inicial <= data final) no extrator.
+- **Descrição:** Ajuste rigoroso no formato das datas (`UNIX timestamp ms`) e fuso horário (`America/Sao_Paulo`) para total compatibilidade com a plataforma Bubble.io.
+- **Descrição:** Implementação de validação de integridade cronológica (Data Inicial <= Data Final) no processamento ETL.
+
+### 🧪 Tests
+- **Tipo:** `test`
+- **Escopo:** `(integration)`
+- **Descrição:** Implementação de suíte de testes de integração (`tests/test_integration.py`) cobrindo o fluxo completo entre API, Downloader e Extrator com mocks de rede.
+- **Descrição:** Aumento da cobertura de código global para 88%, garantindo robustez nas camadas de extração e tratamento de erros de scraper.
+
+### ⚙️ Configuration
+- **Tipo:** `chore`
+- **Escopo:** `(config)`
+- **Descrição:** Ajuste do `REDIS_URL` padrão para `127.0.0.1`, resolvendo conflitos de resolução de nome (`localhost`) observados em ambientes Windows durante o desenvolvimento local.
 
 ## [v1.12.2] - 2026-01-02
 

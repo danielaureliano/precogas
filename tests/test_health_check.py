@@ -20,7 +20,7 @@ def test_health_check_ok(mock_redis_client, mock_requests_head):
 
     assert response.status_code == 200
     assert response.json()["status"] == "UP"
-    assert response.json()["version"] == "1.12.3"
+    assert response.json()["version"] == "1.13.0"
     assert response.json()["checks"]["internet_connection"] == "OK"
     assert response.json()["checks"]["redis_connection"] == "OK"
 
