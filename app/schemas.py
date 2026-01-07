@@ -31,6 +31,11 @@ class HealthCheckResponse(BaseModel):
         description="Status geral da aplicação",
         json_schema_extra={"example": "UP"},
     )
+    version: str = Field(
+        ...,
+        description="Versão atual da aplicação",
+        json_schema_extra={"example": "1.12.3"},
+    )
     checks: Dict[str, str] = Field(
         ...,
         description="Detalhes das verificações de dependências",

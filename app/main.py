@@ -294,6 +294,7 @@ async def health_check(request: Request):
         status_code=overall_status,
         content={
             "status": "UP" if overall_status == status.HTTP_200_OK else "DOWN",
+            "version": request.app.version,
             "checks": status_checks,
         },
     )
