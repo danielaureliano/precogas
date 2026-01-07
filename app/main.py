@@ -95,7 +95,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="PrecoGas API",
-    version="1.12.2",
+    version="1.12.3",
     description="API de monitoramento do preço da gasolina no DF com dados da ANP.",
     lifespan=lifespan,
 )

@@ -113,6 +113,17 @@ Com a aplicação rodando, acesse a documentação interativa:
 ### Principais Endpoints
 
 * `GET /precos`: Retorna o preço atual da gasolina no DF.
+
+    **Exemplo de Resposta:**
+    ```json
+    {
+      "dataInicial": 1766890800000,
+      "dataFinal": 1767409200000,
+      "precoMedioRevenda": 6.42
+    }
+    ```
+    *Nota: As datas são retornadas em UNIX Timestamp (milissegundos) baseadas no fuso horário de Brasília (BRT).*
+
 * `GET /health`: Status de saúde (Redis, Internet).
 * `GET /metrics`: Métricas para Prometheus.
 

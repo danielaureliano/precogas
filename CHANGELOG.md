@@ -7,6 +7,14 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+## [v1.12.3] - 2026-01-07
+
+### 🐛 Bug Fixes
+- **Tipo:** `fix`
+- **Escopo:** `(api)`
+- **Descrição:** Ajuste no formato das datas da resposta do endpoint `/precos` para UNIX timestamp (milissegundos) com base no fuso horário `America/Sao_Paulo`. Esta alteração garante a exibição correta das datas (ex: 28/12 a 03/01) em aplicações frontend como Bubble.io.
+- **Descrição:** Adição de validação de integridade de datas (data inicial <= data final) no extrator.
+
 ## [v1.12.2] - 2026-01-02
 
 ### 🐛 Bug Fixes
@@ -113,8 +121,8 @@ e este projeto adere ao [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 - **Descrição:** Revisão completa do `README.md` incluindo diagrama de fluxo, detalhamento de arquitetura, instalação e uso.
 
 ## [v1.10.1] - 2025-12-08
-... (versões anteriores mantidas)
 
+[v1.12.3]: https://github.com/danielaureliano/precogas/compare/v1.12.2...v1.12.3
 [v1.12.2]: https://github.com/danielaureliano/precogas/compare/v1.12.1...v1.12.2
 [v1.12.1]: https://github.com/danielaureliano/precogas/compare/v1.12.0...v1.12.1
 [v1.12.0]: https://github.com/danielaureliano/precogas/compare/v1.11.1...v1.12.0

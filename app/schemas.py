@@ -3,17 +3,17 @@ from typing import Dict
 
 
 class PrecoGasolinaResponse(BaseModel):
-    data_inicial: str = Field(
+    data_inicial: int = Field(
         ...,
         alias="dataInicial",
-        description="Data de início da semana de referência (dd/mm/aaaa)",
-        json_schema_extra={"example": "01/01/2026"},
+        description="Data de início da semana de referência (UNIX timestamp em milissegundos)",
+        json_schema_extra={"example": 1766890800000},
     )
-    data_final: str = Field(
+    data_final: int = Field(
         ...,
         alias="dataFinal",
-        description="Data de fim da semana de referência (dd/mm/aaaa)",
-        json_schema_extra={"example": "07/01/2026"},
+        description="Data de fim da semana de referência (UNIX timestamp em milissegundos)",
+        json_schema_extra={"example": 1767409200000},
     )
     preco_medio_revenda: float = Field(
         ...,
