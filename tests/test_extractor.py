@@ -29,7 +29,8 @@ def test_extrair_dados_sucesso(mock_excel_file):
 
     assert resultado is not None
     assert resultado["precoMedioRevenda"] == 5.50
-    assert resultado["dataInicial"] == "01/01/2025"
+    assert resultado["dataInicial"] == 1735700400000
+    assert resultado["dataFinal"] == 1736218800000
 
 
 @patch("pandas.ExcelFile")
@@ -78,9 +79,9 @@ def test_extrair_dados_arquivo_invalido():
     assert resultado is None
 
 
-def test_extrair_dados_formato_datas_string():
+def test_extrair_dados_formato_datas_timestamp():
     """
-    Verifica se as datas retornadas por extrair_dados são strings no formato dd/mm/aaaa.
+    Verifica se as datas retornadas por extrair_dados são UNIX timestamps (int).
     """
     # Mock da leitura do Excel
     mock_instance = MagicMock()
@@ -89,8 +90,8 @@ def test_extrair_dados_formato_datas_string():
     data = {
         "ESTADOS": ["DISTRITO FEDERAL"],
         "PRODUTO": ["GASOLINA COMUM"],
-        "DATA INICIAL": [pd.Timestamp("2025-01-01")],  # Simula retorno de Timestamp
-        "DATA FINAL": [pd.Timestamp("2025-01-07")],  # Simula retorno de Timestamp
+        "DATA INICIAL": [pd.Timestamp("2025-01-01")],
+        "DATA FINAL": [pd.Timestamp("2025-01-07")],
         "PREÇO MÉDIO REVENDA": [5.50],
     }
     df = pd.DataFrame(data)
@@ -119,7 +120,7 @@ def test_extrair_dados_formato_datas_string():
             resultado = extrair_dados("caminho/fake.xlsx")
 
     assert resultado is not None
-    assert isinstance(resultado["dataInicial"], str)
-    assert resultado["dataInicial"] == "01/01/2025"
-    assert isinstance(resultado["dataFinal"], str)
-    assert resultado["dataFinal"] == "07/01/2025"
+    assert isinstance(resultado["dataInicial"], int)
+    assert resultado["dataInicial"] == 1735700400000
+    assert isinstance(resultado["dataFinal"], int)
+    assert resultado["dataFinal"] == 1736218800000

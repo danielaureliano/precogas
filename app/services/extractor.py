@@ -103,22 +103,49 @@ def extrair_dados(caminho_arquivo: str | Path):
         row = df_filtrado.iloc[0]
 
         try:
-            # Converter datas para string no formato dd/mm/aaaa
-            data_ini = pd.to_datetime(row[col_ini]).strftime("%d/%m/%Y")
-            data_fim = pd.to_datetime(row[col_fim]).strftime("%d/%m/%Y")
-
             # Tentar converter preço para float, tratando vírgula se necessário (padrão PT-BR)
             preco_raw = row[col_preco]
             if isinstance(preco_raw, str):
                 preco_raw = preco_raw.replace(",", ".")
             preco_float = float(preco_raw)
         except (ValueError, TypeError) as e:
-            logger.error(f"Data Integrity: Erro na conversão de dados: {e}")
+            logger.error(f"Data Integrity: Erro na conversão de preço: {e}")
+            return None
+
+        # Conversão de datas para UNIX UTC timestamp (milissegundos) com timezone de Brasília
+        try:
+            dt_ini = pd.to_datetime(row[col_ini])
+            dt_fim = pd.to_datetime(row[col_fim])
+
+            # Localizar como Brasília (UTC-3)
+            # Se já tiver tz, converte. Se não, localiza.
+            if dt_ini.tzinfo is None:
+                dt_ini = dt_ini.tz_localize("America/Sao_Paulo")
+            else:
+                dt_ini = dt_ini.tz_convert("America/Sao_Paulo")
+
+            if dt_fim.tzinfo is None:
+                dt_fim = dt_fim.tz_localize("America/Sao_Paulo")
+            else:
+                dt_fim = dt_fim.tz_convert("America/Sao_Paulo")
+
+            # Validação básica de intervalo
+            if dt_ini > dt_fim:
+                logger.error(
+                    f"Data Integrity: Data inicial ({dt_ini}) maior que data final ({dt_fim})"
+                )
+                return None
+
+            # Converter para milissegundos
+            ts_ini = int(dt_ini.timestamp() * 1000)
+            ts_fim = int(dt_fim.timestamp() * 1000)
+        except Exception as e:
+            logger.error(f"Data Integrity: Erro ao converter datas para timestamp: {e}")
             return None
 
         dados_formatados = {
-            "dataInicial": data_ini,
-            "dataFinal": data_fim,
+            "dataInicial": ts_ini,
+            "dataFinal": ts_fim,
             "precoMedioRevenda": preco_float,
         }
 

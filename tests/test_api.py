@@ -22,8 +22,8 @@ def test_obter_precos_sucesso(mock_extrair, mock_baixar):
     )
 
     mock_extrair.return_value = {
-        "dataInicial": "01/01/2025",
-        "dataFinal": "07/01/2025",
+        "dataInicial": 1735700400000,
+        "dataFinal": 1736218800000,
         "precoMedioRevenda": 5.99
     }
 
@@ -32,7 +32,7 @@ def test_obter_precos_sucesso(mock_extrair, mock_baixar):
     assert response.status_code == status.HTTP_200_OK
     data = response.json()
     assert data["precoMedioRevenda"] == 5.99
-    assert data["dataInicial"] == "01/01/2025"
+    assert data["dataInicial"] == 1735700400000
 
 @patch("app.main.baixar_arquivo")
 def test_obter_precos_falha_download(mock_baixar):
