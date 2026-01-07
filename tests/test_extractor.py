@@ -124,3 +124,56 @@ def test_extrair_dados_formato_datas_timestamp():
     assert resultado["dataInicial"] == 1735700400000
     assert isinstance(resultado["dataFinal"], int)
     assert resultado["dataFinal"] == 1736218800000
+
+
+@patch("pandas.ExcelFile")
+def test_extrair_dados_datas_invalidas(mock_excel_file):
+    """
+    Testa a validação onde a data inicial é maior que a final.
+    """
+    mock_instance = mock_excel_file.return_value
+    mock_instance.sheet_names = ["ESTADOS"]
+
+    data = {
+        "ESTADOS": ["DISTRITO FEDERAL"],
+        "PRODUTO": ["GASOLINA COMUM"],
+        "DATA INICIAL": ["2025-01-10"],  # Maior
+        "DATA FINAL": ["2025-01-01"],  # Menor
+        "PREÇO MÉDIO REVENDA": [5.50],
+    }
+    df = pd.DataFrame(data)
+    mock_instance.parse.return_value = df
+
+    resultado = extrair_dados("caminho/fake.xlsx")
+    assert resultado is None
+
+
+@patch("pandas.ExcelFile")
+def test_extrair_dados_colunas_faltando(mock_excel_file):
+    """
+    Testa a falha quando colunas obrigatórias não existem.
+    """
+    mock_instance = mock_excel_file.return_value
+    mock_instance.sheet_names = ["ESTADOS"]
+
+    # Faltando DATA FINAL e PREÇO MÉDIO
+    data = {
+        "ESTADOS": ["DISTRITO FEDERAL"],
+        "PRODUTO": ["GASOLINA COMUM"],
+        "DATA INICIAL": ["2025-01-01"],
+    }
+    df = pd.DataFrame(data)
+    mock_instance.parse.return_value = df
+
+    resultado = extrair_dados("caminho/fake.xlsx")
+    assert resultado is None
+
+
+def test_extrair_dados_header_invalido():
+    """
+    Testa configuração de header row inválida.
+    """
+    # Mockando a config para ter header negativo
+    with patch("app.services.extractor.ETL_CONFIG", {"anp": {"header_row": -1}}):
+        resultado = extrair_dados("caminho/fake.xlsx")
+        assert resultado is None

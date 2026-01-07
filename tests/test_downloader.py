@@ -2,11 +2,16 @@ from unittest.mock import patch, MagicMock, mock_open
 from datetime import datetime
 from app.services.downloader import baixar_arquivo
 
+
 @patch("app.services.downloader.get_current_time")
 @patch("app.services.downloader.requests.Session")
-@patch("app.services.downloader.OUTPUT_DIR") # Mocka a variável global OUTPUT_DIR diretamente
+@patch(
+    "app.services.downloader.OUTPUT_DIR"
+)  # Mocka a variável global OUTPUT_DIR diretamente
 @patch("app.services.downloader.redis_client")
-def test_baixar_arquivo_sucesso(mock_redis, mock_output_dir, mock_session, mock_get_time):
+def test_baixar_arquivo_sucesso(
+    mock_redis, mock_output_dir, mock_session, mock_get_time
+):
     """
     Testa o fluxo completo de download com sucesso (HTTP 200).
     Verifica se o arquivo é salvo usando pathlib e se a lógica de scraping é chamada.
@@ -56,7 +61,10 @@ def test_baixar_arquivo_sucesso(mock_redis, mock_output_dir, mock_session, mock_
     url, data_inicio, data_fim, caminho = baixar_arquivo()
 
     # Verificações
-    assert url == "https://www.gov.br/anp/pt-br/assuntos/precos/2025/resumo_semanal_lpc-5.xlsx"
+    assert (
+        url
+        == "https://www.gov.br/anp/pt-br/assuntos/precos/2025/resumo_semanal_lpc-5.xlsx"
+    )
     # As datas agora são None porque vêm do extractor
     assert data_inicio is None
     assert data_fim is None
@@ -67,6 +75,7 @@ def test_baixar_arquivo_sucesso(mock_redis, mock_output_dir, mock_session, mock_
     # Garante que tentou escrever o arquivo
     m.assert_called()
     m().write.assert_called_with(b"conteudo_falso_excel")
+
 
 @patch("app.services.downloader.requests.Session")
 @patch("app.services.downloader.OUTPUT_DIR")
@@ -88,6 +97,19 @@ def test_baixar_arquivo_falha_scraper(mock_redis, mock_output_dir, mock_session)
     session_instance.get.return_value = mock_response_html
 
     url, data_inicio, data_fim, caminho = baixar_arquivo()
+
+    assert url is None
+    assert caminho is None
+
+
+@patch("app.services.downloader.encontrar_url_mais_recente")
+def test_baixar_arquivo_falha_url(mock_encontrar):
+    """
+    Testa o cenário onde o scraper não encontra nenhuma URL.
+    """
+    mock_encontrar.return_value = None
+
+    url, data_ini, data_fim, caminho = baixar_arquivo()
 
     assert url is None
     assert caminho is None
