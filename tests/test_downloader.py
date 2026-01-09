@@ -96,6 +96,10 @@ def test_baixar_arquivo_falha_scraper(mock_redis, mock_output_dir, mock_session)
 
     session_instance.get.return_value = mock_response_html
 
+    # Ensure redis cache returns None (cache miss) for URL lookup
+    if mock_redis:
+        mock_redis.get.return_value = None
+
     url, data_inicio, data_fim, caminho = baixar_arquivo()
 
     assert url is None
