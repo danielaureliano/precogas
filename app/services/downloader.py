@@ -68,6 +68,17 @@ def encontrar_url_mais_recente(session):
     Returns:
         str | None: A URL completa do arquivo .xlsx se encontrado, ou None caso contrário.
     """
+    # 0. Verificar cache da URL para evitar scraping desnecessário
+    cache_key = "anp_latest_url"
+    if redis_client:
+        try:
+            cached_url = redis_client.get(cache_key)
+            if cached_url:
+                logger.info(f"[Cache] URL encontrada no cache: {cached_url}")
+                return cached_url
+        except Exception as e:
+            logger.warning(f"[Cache] Erro ao buscar URL no cache: {e}")
+
     logger.info(f"[Scraper] Buscando URL mais recente em: {SEARCH_URL}")
     try:
         response = session.get(SEARCH_URL, timeout=15)
@@ -85,6 +96,14 @@ def encontrar_url_mais_recente(session):
             # Assume que o primeiro link da página é o mais recente
             url_recente = links_validos[0]
             logger.info(f"[Scraper] URL encontrada: {url_recente}")
+
+            # Salvar no cache por 1 hora (3600 segundos)
+            if redis_client:
+                try:
+                    redis_client.setex(cache_key, 3600, url_recente)
+                except Exception as e:
+                    logger.warning(f"[Cache] Erro ao salvar URL no cache: {e}")
+
             return url_recente
         else:
             logger.warning("[Scraper] Nenhum link de planilha semanal encontrado na página.")
