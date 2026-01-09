@@ -2,6 +2,7 @@ import redis
 import requests
 import re
 from pathlib import Path
+from urllib.parse import urlparse
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from datetime import timedelta
@@ -88,9 +89,16 @@ def encontrar_url_mais_recente(session):
         # Regex captura o conteúdo do href
         links = re.findall(r'href=["\'](.*?\.xlsx)["\']', response.text, re.IGNORECASE)
 
-        # Filtrar links que parecem ser o resumo semanal
-        # Geralmente contém "resumo_semanal"
-        links_validos = [link for link in links if "resumo_semanal" in link.lower()]
+        # Filtrar links que parecem ser o resumo semanal e validacao de dominio
+        links_validos = []
+        for link in links:
+            if "resumo_semanal" in link.lower():
+                # Validação de Segurança: Domínio deve ser gov.br
+                parsed = urlparse(link)
+                if parsed.netloc.endswith("gov.br"):
+                    links_validos.append(link)
+                else:
+                    logger.warning(f"[Security] Link suspeito ignorado (domínio não confiável): {link}")
 
         if links_validos:
             # Assume que o primeiro link da página é o mais recente
@@ -106,7 +114,7 @@ def encontrar_url_mais_recente(session):
 
             return url_recente
         else:
-            logger.warning("[Scraper] Nenhum link de planilha semanal encontrado na página.")
+            logger.warning("[Scraper] Nenhum link válido de planilha semanal encontrado na página.")
             return None
 
     except requests.RequestException as e:
