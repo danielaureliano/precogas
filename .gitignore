@@ -28,3 +28,5 @@ gha-creds-*.json
 .coverage
 htmlcov/
 .ruff_cache/
+
+dump.rdb
