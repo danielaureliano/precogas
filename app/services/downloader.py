@@ -170,12 +170,8 @@ def baixar_arquivo():
     logger.info(f"[Download] Iniciando download de: {url}")
 
     try:
-        # Tenta com verificação SSL
-        try:
-            response = session.get(url, timeout=15, verify=True)
-        except requests.exceptions.SSLError:
-            logger.warning(f"[SSL] Falha na verificação de certificado para {url}. Tentando sem verificação...")
-            response = session.get(url, timeout=15, verify=False)
+        # Requisita com verificação SSL
+        response = session.get(url, timeout=15, verify=True)
 
         if response.status_code == 200:
             OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
