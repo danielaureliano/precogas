@@ -1,0 +1,4 @@
+## 2024-05-18 - Fix MitM vulnerability by enforcing SSL verification
+**Vulnerability:** The application was falling back to `verify=False` during HTTP requests if an `SSLError` occurred in `app/services/downloader.py`. This disables SSL certificate validation, leaving the application vulnerable to Man-in-the-Middle (MitM) attacks where an attacker could intercept and potentially modify the downloaded files or steal sensitive data.
+**Learning:** Security controls like SSL verification should never have automatic fallbacks to insecure modes. If an SSL error occurs, it is an indication of a potential security problem (e.g., misconfigured server, intercepted connection) and failing securely is preferred over proceeding insecurely to ensure application availability.
+**Prevention:** Enforce `verify=True` in all HTTP client calls. Handle `SSLError` exceptions explicitly by logging them as security events and aborting the connection, without attempting an insecure retry.
