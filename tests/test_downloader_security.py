@@ -27,6 +27,30 @@ def test_ssrf_malicious_domain():
     # NOW: This should return None because attacker.com != gov.br
     assert url is None
 
+def test_ssrf_bypass_domain():
+    """
+    SECURITY TEST: Check if the scraper rejects a URL with a bypass domain.
+    Specifically checks for attacker-gov.br which bypasses `.endswith("gov.br")` check.
+    """
+    mock_session = MagicMock()
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+
+    malicious_url = "http://attacker-gov.br/malicious_resumo_semanal.xlsx"
+    mock_response.text = f"""
+    <html>
+        <body>
+            <a href="{malicious_url}">Planilha Semanal (Hacked)</a>
+        </body>
+    </html>
+    """
+    mock_session.get.return_value = mock_response
+
+    url = encontrar_url_mais_recente(mock_session)
+
+    # Should return None because attacker-gov.br is not gov.br or a subdomain of gov.br
+    assert url is None
+
 def test_valid_gov_br_domain():
     """
     Ensure valid gov.br URLs are still accepted.
