@@ -93,9 +93,11 @@ def encontrar_url_mais_recente(session):
         links_validos = []
         for link in links:
             if "resumo_semanal" in link.lower():
-                # Validação de Segurança: Domínio deve ser gov.br
+                # Validação de Segurança: Domínio deve ser gov.br ou subdomínio (evitar bypass com attacker-gov.br)
                 parsed = urlparse(link)
-                if parsed.netloc.endswith("gov.br"):
+                hostname = parsed.hostname
+
+                if hostname and (hostname == "gov.br" or hostname.endswith(".gov.br")):
                     links_validos.append(link)
                 else:
                     logger.warning(f"[Security] Link suspeito ignorado (domínio não confiável): {link}")
