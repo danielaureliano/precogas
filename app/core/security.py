@@ -17,4 +17,14 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Previne sniffing de MIME type
         response.headers["X-Content-Type-Options"] = "nosniff"
         
+        # Previne XSS
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+
+        # Content Security Policy (impede carregamento de recursos externos não autorizados)
+        # Permite scripts de CDN para as documentações interativas do FastAPI (Swagger/ReDoc)
+        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://fastapi.tiangolo.com"
+
+        # Referrer Policy
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+
         return response
