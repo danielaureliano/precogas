@@ -17,4 +17,14 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Previne sniffing de MIME type
         response.headers["X-Content-Type-Options"] = "nosniff"
         
+        # Content Security Policy (CSP)
+        # Permite carregar recursos do próprio domínio e CDNs necessários para o Swagger UI/ReDoc
+        csp = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+            "img-src 'self' data: https://fastapi.tiangolo.com;"
+        )
+        response.headers["Content-Security-Policy"] = csp
+
         return response

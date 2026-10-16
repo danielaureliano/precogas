@@ -49,6 +49,27 @@ def test_obter_precos_falha_download(mock_baixar):
     assert "erro" in response.json()
     assert response.json()["erro"] == "Arquivo não encontrado no site da ANP"
 
+def test_security_headers():
+    """
+    Testa se os headers de segurança (HSTS, Anti-Clickjacking, No-Sniff, CSP) estão presentes nas respostas.
+    """
+    response = client.get("/health")
+
+    assert response.status_code == status.HTTP_200_OK
+    assert "Strict-Transport-Security" in response.headers
+    assert response.headers["X-Frame-Options"] == "DENY"
+    assert response.headers["X-Content-Type-Options"] == "nosniff"
+    assert "Content-Security-Policy" in response.headers
+
+    expected_csp = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+        "img-src 'self' data: https://fastapi.tiangolo.com;"
+    )
+    assert response.headers["Content-Security-Policy"] == expected_csp
+
+
 def test_metrics_endpoint():
     """
     Testa o endpoint /metrics.
