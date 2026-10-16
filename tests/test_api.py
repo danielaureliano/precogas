@@ -60,9 +60,14 @@ def test_security_headers():
     assert response.headers["X-Frame-Options"] == "DENY"
     assert response.headers["X-Content-Type-Options"] == "nosniff"
     assert "Content-Security-Policy" in response.headers
-    assert "default-src 'self'" in response.headers["Content-Security-Policy"]
-    assert "https://cdn.jsdelivr.net" in response.headers["Content-Security-Policy"]
-    assert "https://fastapi.tiangolo.com" in response.headers["Content-Security-Policy"]
+
+    expected_csp = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+        "img-src 'self' data: https://fastapi.tiangolo.com;"
+    )
+    assert response.headers["Content-Security-Policy"] == expected_csp
 
 
 def test_metrics_endpoint():
