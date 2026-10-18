@@ -7,3 +7,8 @@
 **Vulnerability:** Downloader validated the domain of the scraped URL using `parsed.netloc.endswith("gov.br")`. This allowed SSRF/malicious downloads by bypass domains such as `attacker-gov.br` and URLs formatted as `https://attacker.com\\@www.gov.br/...`.
 **Learning:** `netloc` contains both the hostname and optional authentication information. When checking domains, always extract the `.hostname` rather than the whole `netloc` to prevent `@` bypasses. Always ensure domain validation is strict by checking for an exact match or a `.domain` suffix, avoiding substring matches like `endswith("domain")`.
 **Prevention:** Use `parsed.hostname` instead of `parsed.netloc`, and validate using exact matching or `.endswith(".gov.br")` rather than just `.endswith("gov.br")`.
+
+## 2026-10-18 - [Missing Content Security Policy (CSP)]
+**Vulnerability:** The application was missing a Content-Security-Policy (CSP) header, which increases the risk of Cross-Site Scripting (XSS) and data injection attacks by allowing the execution of malicious scripts from untrusted sources.
+**Learning:** Adding a CSP header is a crucial defense-in-depth measure. However, when adding it to an application with interactive documentation like FastAPI (Swagger UI/ReDoc), care must be taken to whitelist the necessary CDNs (e.g., `cdn.jsdelivr.net`) and allow inline scripts/styles and specific image sources to avoid breaking the documentation UI.
+**Prevention:** Always implement a strict `default-src 'self'` CSP and explicitly whitelist only the required external sources for specific directives (`script-src`, `style-src`, `img-src`) based on the application's needs.
