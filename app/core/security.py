@@ -17,4 +17,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Previne sniffing de MIME type
         response.headers["X-Content-Type-Options"] = "nosniff"
         
+        # Content Security Policy (CSP)
+        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data: https://fastapi.tiangolo.com;"
+
         return response
