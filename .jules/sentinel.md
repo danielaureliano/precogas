@@ -12,3 +12,8 @@
 **Vulnerability:** The application was missing `defusedxml` in its `requirements.txt`. The `openpyxl` library, which `pandas` uses to parse the downloaded `.xlsx` files, is vulnerable to XXE attacks if `defusedxml` is not installed to safely parse the underlying XML structure of Excel files.
 **Learning:** Always ensure `defusedxml` is included when parsing potentially untrusted XML-based formats (like `.xlsx` via `openpyxl`). Python's standard library XML parsers are vulnerable to XXE by default.
 **Prevention:** Include `defusedxml` in project dependencies when using `openpyxl` or dealing with XML processing from untrusted sources.
+
+## 2026-10-20 - [Path Traversal in Downloader]
+**Vulnerability:** The application was extracting filenames from URLs using `url.split('/')[-1]`. This is vulnerable to Path Traversal if an attacker forces a URL containing encoded traversal sequences (e.g., `..%2f..%2f`), because the resulting string would include traversal characters resulting in arbitrary file write risks when saved.
+**Learning:** Never construct file paths purely with string manipulation like `split()` on user-controlled input (like URLs or their query strings). URL paths can contain encoded bypasses that become dangerous when written to the file system.
+**Prevention:** Use standard libraries like `urllib.parse.urlparse`, `urllib.parse.unquote`, and `os.path.basename` to extract filenames securely from URLs, and explicitly validate that the resolved path is confined inside the intended output directory by using `path.resolve().is_relative_to(base_dir.resolve())`.
