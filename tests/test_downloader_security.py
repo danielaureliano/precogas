@@ -74,3 +74,31 @@ def test_valid_gov_br_domain():
 
     # This should return the valid URL
     assert url == valid_url
+
+from unittest.mock import patch
+from app.services.downloader import baixar_arquivo
+
+@patch("app.services.downloader.encontrar_url_mais_recente")
+@patch("app.services.downloader.requests.Session")
+@patch("app.services.downloader.redis_client")
+def test_path_traversal_prevention(mock_redis, mock_session, mock_encontrar_url, tmp_path):
+    """
+    Verifica se a tentativa de Path Traversal no nome do arquivo baixado é mitigada.
+    """
+    malicious_url = "https://www.gov.br/anp/pt-br/assuntos/precos/2025/..%2f..%2f..%2f..%2fetc%2fpasswd"
+    mock_encontrar_url.return_value = malicious_url
+
+    mock_output_dir = tmp_path / "dados_anp"
+    mock_output_dir.mkdir()
+
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.content = b"fake data"
+    mock_session.return_value.get.return_value = mock_response
+
+    with patch("app.services.downloader.OUTPUT_DIR", mock_output_dir):
+        url, data_inicio, data_fim, caminho = baixar_arquivo()
+
+        assert caminho is not None
+        assert caminho.name == "passwd"
+        assert str(caminho.parent) == str(mock_output_dir.resolve())
