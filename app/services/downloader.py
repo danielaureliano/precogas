@@ -1,8 +1,9 @@
+import os
 import redis
 import requests
 import re
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, unquote
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 from datetime import timedelta
@@ -150,8 +151,18 @@ def baixar_arquivo():
         return None, None, None, None
 
     # Extrair nome do arquivo da URL
-    nome_arquivo = url.split('/')[-1]
+    nome_arquivo = os.path.basename(unquote(urlparse(url).path))
     caminho_arquivo = OUTPUT_DIR / nome_arquivo
+
+    # Validar se o caminho resolvido está dentro de OUTPUT_DIR para prevenir Path Traversal
+    try:
+        resolved_path = caminho_arquivo.resolve()
+        if not resolved_path.is_relative_to(OUTPUT_DIR.resolve()):
+            logger.error(f"[Segurança] Tentativa de path traversal detectada: {url}")
+            return None, None, None, None
+    except Exception as e:
+        logger.error(f"[Segurança] Erro ao resolver caminho de arquivo: {e}")
+        return None, None, None, None
 
     # Cache key baseada no nome do arquivo (que deve ser único para cada semana)
     cache_key = f"arquivo_precos:{nome_arquivo}"
