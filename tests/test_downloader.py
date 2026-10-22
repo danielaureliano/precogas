@@ -23,6 +23,10 @@ def test_baixar_arquivo_sucesso(
     mock_file_path = MagicMock()
     mock_output_dir.__truediv__.return_value = mock_file_path
 
+    mock_file_path.resolve.return_value = mock_file_path
+    mock_file_path.is_relative_to.return_value = True
+    mock_output_dir.resolve.return_value = mock_output_dir
+
     # Garante que não acha nada no cache nem no disco
     mock_file_path.exists.return_value = False
 
