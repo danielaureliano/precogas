@@ -1,6 +1,7 @@
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 from app.services.downloader import encontrar_url_mais_recente
 
+@patch('app.services.downloader.redis_client', None)
 def test_ssrf_malicious_domain():
     """
     SECURITY TEST: Reproduce SSRF/Malicious Download vulnerability.
@@ -27,6 +28,7 @@ def test_ssrf_malicious_domain():
     # NOW: This should return None because attacker.com != gov.br
     assert url is None
 
+@patch('app.services.downloader.redis_client', None)
 def test_ssrf_bypass_domain():
     """
     SECURITY TEST: Check if the scraper rejects a URL with a bypass domain.
@@ -51,6 +53,7 @@ def test_ssrf_bypass_domain():
     # Should return None because attacker-gov.br is not gov.br or a subdomain of gov.br
     assert url is None
 
+@patch('app.services.downloader.redis_client', None)
 def test_valid_gov_br_domain():
     """
     Ensure valid gov.br URLs are still accepted.
