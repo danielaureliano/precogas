@@ -21,10 +21,16 @@ def test_baixar_arquivo_sucesso(
 
     # Quando fazemos OUTPUT_DIR / "nome", ele chama __truediv__
     mock_file_path = MagicMock()
+    mock_resolved_file_path = MagicMock()
     mock_output_dir.__truediv__.return_value = mock_file_path
+    mock_file_path.resolve.return_value = mock_resolved_file_path
+
+    mock_resolved_base_dir = MagicMock()
+    mock_output_dir.resolve.return_value = mock_resolved_base_dir
+    mock_resolved_file_path.is_relative_to.return_value = True
 
     # Garante que não acha nada no cache nem no disco
-    mock_file_path.exists.return_value = False
+    mock_resolved_file_path.exists.return_value = False
 
     if mock_redis:
         mock_redis.get.return_value = None
@@ -55,7 +61,7 @@ def test_baixar_arquivo_sucesso(
 
     # Mock do open() chamado no objeto Path do arquivo
     m = mock_open()
-    mock_file_path.open = m
+    mock_resolved_file_path.open = m
 
     # Executa
     url, data_inicio, data_fim, caminho = baixar_arquivo()
@@ -85,7 +91,9 @@ def test_baixar_arquivo_falha_scraper(mock_redis, mock_output_dir, mock_session)
     Testa o comportamento quando o scraper não encontra nenhum link válido.
     """
     mock_file_path = MagicMock()
+    mock_resolved_file_path = MagicMock()
     mock_output_dir.__truediv__.return_value = mock_file_path
+    mock_file_path.resolve.return_value = mock_resolved_file_path
 
     session_instance = mock_session.return_value
 
