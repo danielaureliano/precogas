@@ -149,9 +149,16 @@ def baixar_arquivo():
         logger.error("🚨 [Falha] Não foi possível obter a URL do arquivo.")
         return None, None, None, None
 
-    # Extrair nome do arquivo da URL
-    nome_arquivo = url.split('/')[-1]
-    caminho_arquivo = OUTPUT_DIR / nome_arquivo
+    # Extrair nome do arquivo da URL de forma segura contra Path Traversal
+    import os
+    import urllib.parse
+    nome_arquivo = os.path.basename(urllib.parse.unquote(urllib.parse.urlparse(url).path))
+    caminho_arquivo = (OUTPUT_DIR / nome_arquivo).resolve()
+
+    # Validação de segurança: garantir que o caminho final está dentro do OUTPUT_DIR
+    if not caminho_arquivo.is_relative_to(OUTPUT_DIR.resolve()):
+        logger.error(f"🚨 [Segurança] Tentativa de Path Traversal detectada: {url}")
+        return None, None, None, None
 
     # Cache key baseada no nome do arquivo (que deve ser único para cada semana)
     cache_key = f"arquivo_precos:{nome_arquivo}"
