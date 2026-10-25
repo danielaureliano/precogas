@@ -1,6 +1,3 @@
-from unittest.mock import MagicMock
-from app.services.downloader import encontrar_url_mais_recente
-
 from unittest.mock import patch, MagicMock
 from app.services.downloader import encontrar_url_mais_recente, baixar_arquivo
 
