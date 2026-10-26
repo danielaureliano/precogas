@@ -23,8 +23,17 @@ def test_baixar_arquivo_sucesso(
     mock_file_path = MagicMock()
     mock_output_dir.__truediv__.return_value = mock_file_path
 
+    # Precisamos mockar resolve para a verificação de segurança do caminho e uso
+    mock_resolved_file_path = MagicMock()
+    mock_file_path.resolve.return_value = mock_resolved_file_path
+
+    mock_resolved_output_dir = MagicMock()
+    mock_output_dir.resolve.return_value = mock_resolved_output_dir
+
+    mock_resolved_file_path.is_relative_to.return_value = True
+
     # Garante que não acha nada no cache nem no disco
-    mock_file_path.exists.return_value = False
+    mock_resolved_file_path.exists.return_value = False
 
     if mock_redis:
         mock_redis.get.return_value = None
@@ -55,7 +64,7 @@ def test_baixar_arquivo_sucesso(
 
     # Mock do open() chamado no objeto Path do arquivo
     m = mock_open()
-    mock_file_path.open = m
+    mock_resolved_file_path.open = m
 
     # Executa
     url, data_inicio, data_fim, caminho = baixar_arquivo()
