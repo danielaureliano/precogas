@@ -258,7 +258,7 @@ async def health_check(request: Request):
         status_checks["internet_connection"] = "OK"
         logger.info("Verificação de conectividade com a internet: OK", check="internet")
     except requests.exceptions.RequestException as e:
-        status_checks["internet_connection"] = f"FAIL: {e}"
+        status_checks["internet_connection"] = "FAIL"
         overall_status = status.HTTP_503_SERVICE_UNAVAILABLE
         logger.error(
             f"Verificação de conectividade com a internet: FALHA - {e}",
@@ -272,7 +272,7 @@ async def health_check(request: Request):
             status_checks["redis_connection"] = "OK"
             logger.info("Verificação de conexão com Redis: OK", check="redis")
         except redis.exceptions.ConnectionError as e:
-            status_checks["redis_connection"] = f"FAIL: {e}"
+            status_checks["redis_connection"] = "FAIL"
             overall_status = status.HTTP_503_SERVICE_UNAVAILABLE
             logger.error(
                 f"Verificação de conexão com Redis: FALHA - {e}", check="redis"
