@@ -17,3 +17,8 @@
 **Vulnerability:** Downloader used naive string splitting (`url.split('/')[-1]`) to extract the filename from the downloaded file's URL and append it to the base directory path without verification, allowing an attacker to overwrite sensitive files via path traversal (e.g. using `../../../etc/passwd` as the filename).
 **Learning:** Never trust the filename provided by an external URL or user input directly. Always safely extract the base name of the path to strip out directory traversal characters, and validate that the final resolved path stays within the intended target directory.
 **Prevention:** Use `os.path.basename(urllib.parse.unquote(urllib.parse.urlparse(url).path))` to extract filenames from URLs securely, and explicitly validate the target path using `resolved_path.is_relative_to(base_dir)`.
+
+## 2026-10-27 - [Information Disclosure in Health Check]
+**Vulnerability:** The application exposed internal exception details (e.g., `requests.exceptions.RequestException` and `redis.exceptions.ConnectionError`) directly to clients in the JSON response of the `/health` endpoint. This can leak sensitive internal network topology, ports, paths, or dependencies information to an attacker.
+**Learning:** Fail securely. Always return generic error responses for external API clients while reserving detailed stack traces and exception strings exclusively for internal server logs.
+**Prevention:** Avoid embedding the exception object string representation (`{e}`) in the client-facing API responses (e.g., replace `status_checks["redis_connection"] = f"FAIL: {e}"` with `status_checks["redis_connection"] = "FAIL"`).
