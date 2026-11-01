@@ -22,3 +22,7 @@
 **Vulnerability:** The application exposed internal exception details (e.g., `requests.exceptions.RequestException` and `redis.exceptions.ConnectionError`) directly to clients in the JSON response of the `/health` endpoint. This can leak sensitive internal network topology, ports, paths, or dependencies information to an attacker.
 **Learning:** Fail securely. Always return generic error responses for external API clients while reserving detailed stack traces and exception strings exclusively for internal server logs.
 **Prevention:** Avoid embedding the exception object string representation (`{e}`) in the client-facing API responses (e.g., replace `status_checks["redis_connection"] = f"FAIL: {e}"` with `status_checks["redis_connection"] = "FAIL"`).
+## 2025-02-27 - Prometheus Cardinality Explosion (DoS) in FastAPI
+**Vulnerability:** The application was logging raw HTTP paths (`request.url.path`) as the `endpoint` label in Prometheus metrics (`http_requests_total`, `http_response_time_seconds`). This allows attackers to send requests to arbitrary paths (e.g., `/non-existent-1`, `/non-existent-2`) resulting in unbounded metric labels.
+**Learning:** Using raw, unvalidated HTTP paths for metric labels leads to memory exhaustion and Cardinality Explosion DoS attacks.
+**Prevention:** Always track the matched route template (`request.scope.get('route').path`) instead of the raw HTTP path, and use a static fallback like `unmatched_route` for unhandled paths.
