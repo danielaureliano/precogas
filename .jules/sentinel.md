@@ -22,3 +22,8 @@
 **Vulnerability:** The application exposed internal exception details (e.g., `requests.exceptions.RequestException` and `redis.exceptions.ConnectionError`) directly to clients in the JSON response of the `/health` endpoint. This can leak sensitive internal network topology, ports, paths, or dependencies information to an attacker.
 **Learning:** Fail securely. Always return generic error responses for external API clients while reserving detailed stack traces and exception strings exclusively for internal server logs.
 **Prevention:** Avoid embedding the exception object string representation (`{e}`) in the client-facing API responses (e.g., replace `status_checks["redis_connection"] = f"FAIL: {e}"` with `status_checks["redis_connection"] = "FAIL"`).
+
+## 2026-11-20 - [Prometheus Cardinality Explosion (DoS)]
+**Vulnerability:** The metrics middleware tracked the raw HTTP path in the Prometheus metric labels `http_requests_total` and `http_response_time_seconds`. This allows malicious actors to send requests to random, unique paths, generating unbounded cardinality in Prometheus metrics and exhausting application and server memory (DoS).
+**Learning:** Always track the matched route template (e.g. `/users/{id}`) rather than the raw HTTP path (e.g. `/users/123` vs `/users/456`) in Prometheus metrics to prevent unbounded cardinality.
+**Prevention:** Extract the matched route template using `request.scope.get('route').path` after the routing logic (`await call_next(request)`) and use it in the metric labels, falling back to a static string like `"unmatched_route"` for unhandled paths.
