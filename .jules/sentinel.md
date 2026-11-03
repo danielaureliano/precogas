@@ -22,3 +22,8 @@
 **Vulnerability:** The application exposed internal exception details (e.g., `requests.exceptions.RequestException` and `redis.exceptions.ConnectionError`) directly to clients in the JSON response of the `/health` endpoint. This can leak sensitive internal network topology, ports, paths, or dependencies information to an attacker.
 **Learning:** Fail securely. Always return generic error responses for external API clients while reserving detailed stack traces and exception strings exclusively for internal server logs.
 **Prevention:** Avoid embedding the exception object string representation (`{e}`) in the client-facing API responses (e.g., replace `status_checks["redis_connection"] = f"FAIL: {e}"` with `status_checks["redis_connection"] = "FAIL"`).
+
+## 2026-11-04 - [Prometheus Cardinality Explosion (DoS)]
+**Vulnerability:** The application was using the raw HTTP request path (`request.url.path`) as a label for Prometheus metrics (`REQUESTS_TOTAL`, `RESPONSE_TIME_SECONDS`), exposing the application to DoS attacks via Prometheus Cardinality Explosion (e.g., attackers sending requests to randomly generated paths).
+**Learning:** Never use raw, unsanitized user input or raw request paths directly as labels in metrics, especially when the path can contain variable data like IDs or UUIDs. Doing so will lead to unbounded memory consumption in the monitoring system and the application itself.
+**Prevention:** Always use the matched route template (e.g., `request.scope.get('route').path`) instead of the raw path. When routing happens downstream, ensure the route template is extracted *after* the request is processed (e.g., after `await call_next(request)` in a middleware), and provide a safe fallback like `unmatched_route` for unhandled paths.
