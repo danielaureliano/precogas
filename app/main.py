@@ -146,20 +146,24 @@ async def add_process_time_header(request: Request, call_next):
     response = await call_next(request)
     process_time = time.time() - start_time
 
+    # Extrair a rota correspondente (evita Cardinality Explosion no Prometheus)
+    route = request.scope.get("route")
+    route_path = route.path if route else "unmatched_route"
+
     # Registrar métricas
     REQUESTS_TOTAL.labels(
         method=request.method,
-        endpoint=request.url.path,
+        endpoint=route_path,
         status_code=response.status_code,
     ).inc()
     RESPONSE_TIME_SECONDS.labels(
-        method=request.method, endpoint=request.url.path
+        method=request.method, endpoint=route_path
     ).observe(process_time)
 
     logger.info(
         "Finalizando requisição",
         method=request.method,
-        endpoint=request.url.path,
+        endpoint=route_path,
         status_code=response.status_code,
         response_time_sec=process_time,
         trace_id=trace_id,
