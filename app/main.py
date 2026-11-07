@@ -146,14 +146,17 @@ async def add_process_time_header(request: Request, call_next):
     response = await call_next(request)
     process_time = time.time() - start_time
 
+    route = request.scope.get("route")
+    route_path = route.path if route else "unmatched_route"
+
     # Registrar métricas
     REQUESTS_TOTAL.labels(
         method=request.method,
-        endpoint=request.url.path,
+        endpoint=route_path,
         status_code=response.status_code,
     ).inc()
     RESPONSE_TIME_SECONDS.labels(
-        method=request.method, endpoint=request.url.path
+        method=request.method, endpoint=route_path
     ).observe(process_time)
 
     logger.info(
